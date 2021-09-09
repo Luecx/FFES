@@ -6,6 +6,7 @@
 #define FEM_SRC_MATRIX_DENSEMATRIX_H_
 
 #include "Matrix.h"
+#include "QuickMatrix.h"
 #include <cstring>
 
 class DenseMatrix : public Matrix {
@@ -88,6 +89,24 @@ class DenseMatrix : public Matrix {
             }
         }
     }
+    Precision dot(const DenseMatrix& other) const{
+        ASSERT(m == other.m);
+        ASSERT(n == other.n);
+        Precision res = 0;
+        for(int i = 0; i < m * n; i++){
+            res += data[i] * other.data[i];
+        }
+        return res;
+    }
+    DenseMatrix hadamard(const DenseMatrix& other) const{
+        ASSERT(m == other.m);
+        ASSERT(n == other.n);
+        DenseMatrix res{*this};
+        for(int i = 0; i < m * n; i++){
+            res.data[i] = data[i] * other.data[i];
+        }
+        return res;
+    }
 
     DenseMatrix& operator=(const DenseMatrix& other){
         ASSERT(m == other.m &&
@@ -99,6 +118,8 @@ class DenseMatrix : public Matrix {
         delete[] this->data;
         this->data = other.data;
         other.data = nullptr;
+        this->m = other.m;
+        this->n = other.n;
         return *this;
     }
     DenseMatrix& operator=(const Precision s){
@@ -116,7 +137,7 @@ class DenseMatrix : public Matrix {
         }
         return *this;
     }
-    DenseMatrix operator+(const DenseMatrix& other){
+    DenseMatrix operator+(const DenseMatrix& other) const{
         ASSERT(m == other.m &&
                n == other.n);
         DenseMatrix res{*this};
@@ -133,51 +154,47 @@ class DenseMatrix : public Matrix {
         }
         return *this;
     }
-    DenseMatrix operator-(const DenseMatrix& other){
+    DenseMatrix operator-(const DenseMatrix& other) const{
         ASSERT(m == other.m &&
                n == other.n);
         DenseMatrix res{*this};
-        for(int p_m = 0; p_m < this->m; p_m++){
-            for(int p_n = 0; p_n < this->n; p_n++){
-                res(p_m,p_n) -= other(p_m,p_n);
-            }
-        }
+        res -= other;
         return res;
     }
-    DenseMatrix operator-(){
+    DenseMatrix operator-() const{
         DenseMatrix res{*this};
         for(int p_m = 0; p_m < this->m; p_m++){
             for(int p_n = 0; p_n < this->n; p_n++){
-                res(p_m,p_n) -= at(p_m,p_n);
+                res(p_m,p_n) = -get(p_m,p_n);
             }
         }
         return res;
     }
-    DenseMatrix operator!(){
+    DenseMatrix operator!() const{
         DenseMatrix res{n,m};
         for(int p_m = 0; p_m < this->m; p_m++){
             for(int p_n = 0; p_n < this->n; p_n++){
-                res.at(p_n,p_m) = this->at(p_m,p_n);
+                res.at(p_n,p_m) = get(p_m,p_n);
             }
         }
         return res;
     }
 
-    DenseMatrix operator*(const DenseMatrix& other){
+    DenseMatrix operator*(const DenseMatrix& other) const{
         ASSERT(n == other.m);
         DenseMatrix res{m, other.n};
         for(int p_m = 0; p_m < this->m; p_m++){
             for(int p_g = 0; p_g < other.n; p_g++){
                 Precision sum = 0;
                 for(int p_n = 0; p_n < this->n; p_n++){
-                    sum += other(p_n,p_g) * at(p_m,p_n);
+                    sum += other(p_n,p_g) * get(p_m,p_n);
                 }
                 res(p_m,p_g) = sum;
             }
         }
         return res;
     }
-    DenseMatrix operator*(const Precision s){
+    DenseMatrix operator*(const Precision s) const{
         DenseMatrix res{*this};
         res *= s;
         return res;

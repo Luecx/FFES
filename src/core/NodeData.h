@@ -15,6 +15,7 @@ enum NodeDataEntries{
     VELOCITY,                       // coordinates
     BOUNDARY_IS_CONSTRAINED,        // 1 if boundary displacement is constrained (see below)
     BOUNDARY_DISPLACEMENT,          // boundary displacement, relevant if BOUNDARY_IS_CONSTRAINED = 1
+    BOUNDARY_FORCE,                 // boundary force, not relevant if constrained
     DISPLACEMENT,                   // displacement in final solution
     N_MAX_NODE_FLOAT_ENTRIES
 };

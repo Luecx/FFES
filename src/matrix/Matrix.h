@@ -14,10 +14,10 @@
 #include <ostream>
 
 class Matrix {
-
+    protected:
+    int m, n;
 public:
 
-    const int m, n;
 
     Matrix(int m_p, int n_p) : m(m_p), n(n_p) {}
 
@@ -52,14 +52,14 @@ public:
         using std::fixed;
         using namespace std;
 
-        os << std::fixed << std::setprecision(4) << defaultfloat << std::setfill(' ');
+        os << std::fixed << std::setprecision(6) << defaultfloat << std::setfill(' ');
 
         for (int i = 0; i < matrix.getM(); i++) {
             for (int j = 0; j < matrix.getN(); j++) {
                 if(abs(matrix.get(i,j)) < 1e-12){
-                    os << std::setw(10) << 0 << " ";
+                    os << std::setw(12) << 0 << " ";
                 }else{
-                    os << std::setw(10) << matrix.get(i, j) << " ";
+                    os << std::setw(12) << matrix.get(i, j) << " ";
 
                 }
             }

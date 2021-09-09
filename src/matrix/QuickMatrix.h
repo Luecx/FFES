@@ -147,6 +147,7 @@ QuickMatrix(const QuickMatrix<M,N>& other) : Matrix(M,N) {
         return *this;
     }
 
+
 };
 
 

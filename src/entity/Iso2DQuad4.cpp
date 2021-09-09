@@ -6,7 +6,7 @@
 #include "../assert/Error.h"
 #include "../integration/Quadrature.h"
 Iso2DQuad4::Iso2DQuad4(int node_1, int node_2, int node_3, int node_4)
-    : node1(node_1), node2(node_2), node3(node_3), node4(node_4) {}
+    : node_ids {node_1, node_2, node_3, node_4} {}
 
 DenseMatrix Iso2DQuad4::computeLocalStiffness() {
 
@@ -14,6 +14,11 @@ DenseMatrix Iso2DQuad4::computeLocalStiffness() {
 
     DenseMatrix       integration_points = integrate<ISO_QUAD, LINEAR>();
     auto              mat_matrix         = material->getMaterialMatrix2D();
+
+    auto node1 = node_ids[0];
+    auto node2 = node_ids[1];
+    auto node3 = node_ids[2];
+    auto node4 = node_ids[3];
 
     Precision         x1                 = (*node_data)[POSITION][node1][0];
     Precision         y1                 = (*node_data)[POSITION][node1][1];
@@ -27,7 +32,7 @@ DenseMatrix Iso2DQuad4::computeLocalStiffness() {
     Precision         x4                 = (*node_data)[POSITION][node4][0];
     Precision         y4                 = (*node_data)[POSITION][node4][1];
 
-    for (int i = 0; i < integration_points.m; i++) {
+    for (int i = 0; i < integration_points.getM(); i++) {
         Precision        r = integration_points(i, 0);
         Precision s = integration_points(i,1);
 
@@ -94,3 +99,6 @@ DenseMatrix Iso2DQuad4::computeLocalStiffness() {
     return DenseMatrix{stiffness};
 
 }
+int Iso2DQuad4::nodeCount() {return 4;}
+int* Iso2DQuad4::nodeIDS() { return node_ids; }
+int  Iso2DQuad4::nodeDOF() { return 2; }

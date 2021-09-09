@@ -9,13 +9,16 @@
 #include "../matrix/QuickMatrix.h"
 #include "Element.h"
 
-struct Iso2DQuad4 : public Element{
+struct Iso2DQuad4 : public Element {
 
-    int node1, node2, node3, node4;
-
+    int node_ids[4] {};
     Iso2DQuad4(int node_1, int node_2, int node_3, int node_4);
 
     DenseMatrix computeLocalStiffness() override;
+
+    int         nodeDOF() override;
+    int         nodeCount() override;
+    int*        nodeIDS() override;
 };
 
 #endif    // FEM_SRC_ENTITY_ISO2DQUAD4_H_

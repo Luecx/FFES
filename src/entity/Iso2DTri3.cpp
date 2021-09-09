@@ -5,7 +5,7 @@
 
 #include "../assert/Error.h"
 Iso2DTri3::Iso2DTri3(int node_1, int node_2, int node_3)
-    : node1(node_1), node2(node_2), node3(node_3) {}
+    : node_ids{node_1, node_2, node_3}{}
 
 DenseMatrix Iso2DTri3::computeLocalStiffness() {
 
@@ -65,14 +65,14 @@ DenseMatrix Iso2DTri3::computeLocalStiffness() {
 QuickMatrix<2, 2> Iso2DTri3::computeJacobian() {
     QuickMatrix<2, 2> jacobian {};
 
-    Precision            x1 = (*node_data)[POSITION][node1][0];
-    Precision            y1 = (*node_data)[POSITION][node1][1];
+    Precision            x1 = (*node_data)[POSITION][node_ids[0]][0];
+    Precision            y1 = (*node_data)[POSITION][node_ids[0]][1];
 
-    Precision            x2 = (*node_data)[POSITION][node2][0];
-    Precision            y2 = (*node_data)[POSITION][node2][1];
+    Precision            x2 = (*node_data)[POSITION][node_ids[1]][0];
+    Precision            y2 = (*node_data)[POSITION][node_ids[1]][1];
 
-    Precision            x3 = (*node_data)[POSITION][node3][0];
-    Precision            y3 = (*node_data)[POSITION][node3][1];
+    Precision            x3 = (*node_data)[POSITION][node_ids[2]][0];
+    Precision            y3 = (*node_data)[POSITION][node_ids[2]][1];
 
     /**    --                    --
      *     | -x1 + x2    -y1 + y2 |
@@ -89,3 +89,6 @@ QuickMatrix<2, 2> Iso2DTri3::computeJacobian() {
 
     return jacobian;
 }
+int  Iso2DTri3::nodeCount() { return 3; }
+int* Iso2DTri3::nodeIDS() { return node_ids; }
+int  Iso2DTri3::nodeDOF() { return 2; }

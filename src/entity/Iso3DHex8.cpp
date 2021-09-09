@@ -8,8 +8,7 @@
 
 Iso3DHex8::Iso3DHex8(int node_1, int node_2, int node_3, int node_4, int node_5, int node_6,
                      int node_7, int node_8)
-    : node1(node_1), node2(node_2), node3(node_3), node4(node_4), node5(node_5), node6(node_6),
-      node7(node_7), node8(node_8) {}
+    : node_ids{node_1, node_2, node_3, node_4, node_5, node_6, node_7, node_8} {}
 
 DenseMatrix Iso3DHex8::computeLocalStiffness() {
 
@@ -20,40 +19,13 @@ DenseMatrix Iso3DHex8::computeLocalStiffness() {
 
     QuickMatrix<8, 3>   node_coords {};
 
-    node_coords(0, 0) = (*node_data)[POSITION][node1][0];
-    node_coords(0, 1) = (*node_data)[POSITION][node1][1];
-    node_coords(0, 2) = (*node_data)[POSITION][node1][2];
+    for(int i = 0; i < 8; i++){
+        node_coords(i, 0) = (*node_data)[POSITION][node_ids[i]][0];
+        node_coords(i, 1) = (*node_data)[POSITION][node_ids[i]][1];
+        node_coords(i, 2) = (*node_data)[POSITION][node_ids[i]][2];
+    }
 
-    node_coords(1, 0) = (*node_data)[POSITION][node2][0];
-    node_coords(1, 1) = (*node_data)[POSITION][node2][1];
-    node_coords(1, 2) = (*node_data)[POSITION][node2][2];
-
-    node_coords(2, 0) = (*node_data)[POSITION][node3][0];
-    node_coords(2, 1) = (*node_data)[POSITION][node3][1];
-    node_coords(2, 2) = (*node_data)[POSITION][node3][2];
-
-    node_coords(3, 0) = (*node_data)[POSITION][node4][0];
-    node_coords(3, 1) = (*node_data)[POSITION][node4][1];
-    node_coords(3, 2) = (*node_data)[POSITION][node4][2];
-
-    node_coords(4, 0) = (*node_data)[POSITION][node5][0];
-    node_coords(4, 1) = (*node_data)[POSITION][node5][1];
-    node_coords(4, 2) = (*node_data)[POSITION][node5][2];
-
-    node_coords(5, 0) = (*node_data)[POSITION][node6][0];
-    node_coords(5, 1) = (*node_data)[POSITION][node6][1];
-    node_coords(5, 2) = (*node_data)[POSITION][node6][2];
-
-    node_coords(6, 0) = (*node_data)[POSITION][node7][0];
-    node_coords(6, 1) = (*node_data)[POSITION][node7][1];
-    node_coords(6, 2) = (*node_data)[POSITION][node7][2];
-
-    node_coords(7, 0) = (*node_data)[POSITION][node8][0];
-    node_coords(7, 1) = (*node_data)[POSITION][node8][1];
-    node_coords(7, 2) = (*node_data)[POSITION][node8][2];
-
-
-    for (int i = 0; i < integration_points.m ; i++) {
+    for (int i = 0; i < integration_points.getM() ; i++) {
         Precision        r = integration_points(i, 0);
         Precision        s = integration_points(i, 1);
         Precision        t = integration_points(i, 2);
@@ -84,21 +56,22 @@ DenseMatrix Iso3DHex8::computeLocalStiffness() {
         local_shape_derivative *= 0.125;
 
         // compute jacobian
-        QuickMatrix<3,3> jacobian_transposed{};
+        QuickMatrix<3,3> jacobian {};
         for(int n = 0; n < 3; n++){
             for(int j = 0; j < 3; j++){
                 Precision sum = 0;
                 for(int b = 0; b < 8; b++){
                     sum += node_coords(b,n) * local_shape_derivative(j,b);
                 }
-                jacobian_transposed(n,j) = sum;
+                jacobian(j,n) = sum;
             }
         }
-
+//        std::cout << jacobian << std::endl;
+//        jacobian = !jacobian;
 
         // compute inverse jacobian + determinant
         Precision det;
-        auto inv = inverse3x3(jacobian_transposed, det);
+        auto inv = inverse3x3(jacobian, det);
 
         // error handling
         ERROR(det > 0, NEGATIVE_JACOBIAN);
@@ -132,3 +105,6 @@ DenseMatrix Iso3DHex8::computeLocalStiffness() {
 
     return DenseMatrix{stiffness};
 }
+int  Iso3DHex8::nodeCount() { return 8; }
+int* Iso3DHex8::nodeIDS() { return node_ids; }
+int  Iso3DHex8::nodeDOF() { return 3; }

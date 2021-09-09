@@ -10,7 +10,8 @@ enum ErrorCodes {
     NEGATIVE_JACOBIAN,
     NO_MATERIAL_ASSIGNED,
     ELEMENT_SET_NOT_FOUND,
-    MATERIAL_NOT_FOUND
+    MATERIAL_NOT_FOUND,
+    DIFFERENT_NUMBER_DOF_ELEMENTS
 };
 
 #define ERROR(expr, code)                                                                            \

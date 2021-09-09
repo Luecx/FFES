@@ -17,6 +17,11 @@ struct Element {
     virtual ~Element() {}
 
     virtual DenseMatrix computeLocalStiffness() = 0;
+
+
+    virtual int  nodeDOF() = 0;
+    virtual int  nodeCount() = 0;
+    virtual int* nodeIDS() = 0;
 };
 
 

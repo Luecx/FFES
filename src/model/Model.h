@@ -1,6 +1,20 @@
-//
-// Created by Luecx on 02.09.2021.
-//
+/****************************************************************************************************
+ *                                                                                                  *
+ *                                                FFES                                              *
+ *                                          by. Finn Eggers                                         *
+ *                                                                                                  *
+ *                    FFESis free software: you can redistribute it and/or modify                   *
+ *                it under the terms of the GNU General Public License as published by              *
+ *                 the Free Software Foundation, either version 3 of the License, or                *
+ *                                (at your option) any later version.                               *
+ *                       FFESis distributed in the hope that it will be useful,                     *
+ *                   but WITHOUT ANY WARRANTY; without even the implied warranty of                 *
+ *                   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                  *
+ *                            GNU General Public License for more details.                          *
+ *                 You should have received a copy of the GNU General Public License                *
+ *                   along with FFES.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                                                  *
+ ****************************************************************************************************/
 
 #ifndef FEM_SRC_ENTITY_MODEL_H_
 #define FEM_SRC_ENTITY_MODEL_H_
@@ -10,7 +24,7 @@
 #include "../core/Set.h"
 #include "../entity/Element.h"
 #include "../material/Material.h"
-#include "../matrix/ListedMatrix.h"
+#include "../eigen/SparseCore"
 
 #include <vector>
 
@@ -39,10 +53,14 @@ struct Model {
         : max_node_count   (p_node_count),
           max_element_count(p_element_count) {
 
-        node_data[POSITION].init(max_node_count * 3, max_node_count);
-        node_data[BOUNDARY_IS_CONSTRAINED].init(max_node_count * 3, max_node_count);
-        node_data[BOUNDARY_DISPLACEMENT  ].init(max_node_count * 3, max_node_count);
-        node_data[BOUNDARY_FORCE         ].init(max_node_count * 3, max_node_count);
+        node_data[POSITION                           ].init(max_node_count * 3, max_node_count).even(3);
+        node_data[BOUNDARY_IS_CONSTRAINED            ].init(max_node_count * 3, max_node_count).even(3);
+        node_data[BOUNDARY_DISPLACEMENT              ].init(max_node_count * 3, max_node_count).even(3);
+        node_data[BOUNDARY_FORCE                     ].init(max_node_count * 3, max_node_count).even(3);
+        node_data[BOUNDARY_IMPLIED_DISPLACEMENT_FORCE].init(max_node_count * 3, max_node_count).even(3);
+        node_data[DISPLACEMENT                       ].init(max_node_count * 3, max_node_count).even(3);
+        node_data[STRESS                             ].init(max_node_count * 6, max_node_count).even(6);
+
         elements.reserve(max_element_count);
 
         activeElementSet("EALL");
@@ -61,13 +79,10 @@ struct Model {
 
     // functions to add nodes/elements
     void addNode(Precision x, Precision y, Precision z=(Precision)0){
-        node_data[POSITION].setIndexIncremental(node_count++, 3);
+        node_count ++;
         node_data[POSITION][node_count-1][0] = x;
         node_data[POSITION][node_count-1][1] = y;
         node_data[POSITION][node_count-1][2] = z;
-        node_data[BOUNDARY_IS_CONSTRAINED].setIndexIncremental(node_count-1, 3);
-        node_data[BOUNDARY_DISPLACEMENT  ].setIndexIncremental(node_count-1, 3);
-        node_data[BOUNDARY_FORCE         ].setIndexIncremental(node_count-1, 3);
 
         this->node_sets[active_node_set].ids.push_back(node_count-1);
     }
@@ -77,7 +92,7 @@ struct Model {
         if(nodal_dimension == 0){
             nodal_dimension = el->nodeDOF();
         }
-        ERROR(nodal_dimension == el->nodeDOF(), DIFFERENT_NUMBER_DOF_ELEMENTS)
+        ERROR(nodal_dimension == el->nodeDOF(), DIFFERENT_NUMBER_DOF_ELEMENTS, nodal_dimension);
         this->elements.push_back(el);
         this->elements[element_count++]->node_data = &node_data;
 
@@ -131,10 +146,13 @@ struct Model {
     void solidSection(const std::string& set, const std::string& material);
 
     // build global stiffness matrix
-    ListedMatrix buildReducedStiffnessMatrix();
+    Eigen::SparseMatrix<Precision> buildReducedStiffnessMatrix();
 
     // build load vector
-    DenseMatrix buildReducedLoadVector(const ListedMatrix& reducedStiffness);
+    Eigen::VectorXd buildReducedLoadVector();
+
+    // compute displacements for every node
+    void postProcessDisplacements(const Eigen::VectorXd& displacement);
 
     // numerate unconstrained vertices
     ID numerateUnconstrainedNodes();

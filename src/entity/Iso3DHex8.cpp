@@ -1,6 +1,20 @@
-//
-// Created by Luecx on 06.09.2021.
-//
+/****************************************************************************************************
+ *                                                                                                  *
+ *                                                FFES                                              *
+ *                                          by. Finn Eggers                                         *
+ *                                                                                                  *
+ *                    FFESis free software: you can redistribute it and/or modify                   *
+ *                it under the terms of the GNU General Public License as published by              *
+ *                 the Free Software Foundation, either version 3 of the License, or                *
+ *                                (at your option) any later version.                               *
+ *                       FFESis distributed in the hope that it will be useful,                     *
+ *                   but WITHOUT ANY WARRANTY; without even the implied warranty of                 *
+ *                   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                  *
+ *                            GNU General Public License for more details.                          *
+ *                 You should have received a copy of the GNU General Public License                *
+ *                   along with FFES.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                                                  *
+ ****************************************************************************************************/
 #include "Iso3DHex8.h"
 
 #include "../assert/Error.h"
@@ -57,8 +71,8 @@ DenseMatrix Iso3DHex8::computeLocalStiffness() {
 
         // compute jacobian
         QuickMatrix<3,3> jacobian {};
-        for(int n = 0; n < 3; n++){
-            for(int j = 0; j < 3; j++){
+        for(int j = 0; j < 3; j++){
+            for(int n = 0; n < 3; n++){
                 Precision sum = 0;
                 for(int b = 0; b < 8; b++){
                     sum += node_coords(b,n) * local_shape_derivative(j,b);
@@ -66,16 +80,14 @@ DenseMatrix Iso3DHex8::computeLocalStiffness() {
                 jacobian(j,n) = sum;
             }
         }
-//        std::cout << jacobian << std::endl;
-//        jacobian = !jacobian;
 
         // compute inverse jacobian + determinant
         Precision det;
         auto inv = inverse3x3(jacobian, det);
 
         // error handling
-        ERROR(det > 0, NEGATIVE_JACOBIAN);
-        ERROR(material, NO_MATERIAL_ASSIGNED);
+        ERROR(det > 0, NEGATIVE_JACOBIAN, det);
+        ERROR(material, NO_MATERIAL_ASSIGNED, 0);
 
         // compute derivatives with respect to x,y
         auto B_help = inv * local_shape_derivative;

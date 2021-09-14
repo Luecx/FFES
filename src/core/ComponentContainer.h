@@ -1,6 +1,20 @@
-//
-// Created by Luecx on 01.09.2021.
-//
+/****************************************************************************************************
+ *                                                                                                  *
+ *                                                FFES                                              *
+ *                                          by. Finn Eggers                                         *
+ *                                                                                                  *
+ *                    FFESis free software: you can redistribute it and/or modify                   *
+ *                it under the terms of the GNU General Public License as published by              *
+ *                 the Free Software Foundation, either version 3 of the License, or                *
+ *                                (at your option) any later version.                               *
+ *                       FFESis distributed in the hope that it will be useful,                     *
+ *                   but WITHOUT ANY WARRANTY; without even the implied warranty of                 *
+ *                   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                  *
+ *                            GNU General Public License for more details.                          *
+ *                 You should have received a copy of the GNU General Public License                *
+ *                   along with FFES.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                                                  *
+ ****************************************************************************************************/
 
 #ifndef FEM_SRC_CORE_COMPONENTCONTAINER_H_
 #define FEM_SRC_CORE_COMPONENTCONTAINER_H_
@@ -28,12 +42,19 @@ template<typename C> struct ComponentContainer {
         cleanUp();
     }
 
-    void init(int p_data_count, int p_index_count) {
+    ComponentContainer& init(int p_data_count, int p_index_count) {
         this->cleanUp();
         this->data        = new C[p_data_count]{};
         this->indices     = new int[p_index_count]{};
         this->data_count  = p_data_count;
         this->index_count = p_index_count;
+        return *this;
+    }
+
+    void even(int spacing){
+        for(int i = 0; i < index_count; i++){
+            setIndexIncremental(i, spacing);
+        }
     }
 
     void cleanUp() {
@@ -67,16 +88,16 @@ template<typename C> struct ComponentContainer {
 
     friend std::ostream& operator<<(std::ostream& os, const ComponentContainer& container) {
         os << "Component Container<" << typeid(C).name() << ">\n";
-        os << std::setw(10) << "#" << std::setw(10) << "data"<< "\n";
+        os << std::setw(18) << "#" << std::setw(18) << "data"<< "\n";
         for(int i = 0; i < container.index_count; i++){
             int lower = container.indices[i];
             int upper = (i == (container.index_count - 1))
                 ? container.data_count
                 : container.indices[i+1];
             os << std::right;
-            os << std::setw(10) << i << std::setw(10) << container.data[lower] << "\n";
+            os << std::setw(18) << i << std::setw(18) << container.data[lower] << "\n";
             for(int n = lower+1; n < upper; n++){
-                os << std::setw(20) << container.data[n] << "\n";
+                os << std::setw(36) << container.data[n] << "\n";
             }
         }
         return os;

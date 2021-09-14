@@ -6,11 +6,10 @@
 #include "src/material/IsotropicMaterial.h"
 #include "src/matrix/DenseMatrix.h"
 #include "src/matrix/Inverse.h"
-#include "src/matrix/ListedMatrix.h"
 #include "src/matrix/Matrix.h"
 #include "src/matrix/QuickMatrix.h"
-#include "src/matrix/SparseMatrix.h"
 #include "src/model/Model.h"
+#include "src/reader/Reader.h"
 #include "src/solver/CG.h"
 #include "src/system/System.h"
 
@@ -43,63 +42,47 @@ int stopMeasure() {
 }
 int main() {
 
-    Model model{400,99};
-
-    model.activeNodeSet("EINSPANNUNG");
-    for(int i = 0; i < 100; i++){
-        model.addNode((float)i,0.0f,0.0f);
-        model.addNode((float)i,1.0f,0.0f);
-        model.addNode((float)i,1.0f,1.0f);
-        model.addNode((float)i,0.0f,1.0f);
-        model.activeNodeSet("NORMAL");
-    }
-
-    for(int i = 0; i < 99; i++){
-        model.addElement<Iso3DHex8>(i * 4 + 0,
-                                    i * 4 + 1,
-                                    i * 4 + 2,
-                                    i * 4 + 3,
-                                    i * 4 + 4,
-                                    i * 4 + 5,
-                                    i * 4 + 6,
-                                    i * 4 + 7);
-    }
-
-
-    model.addMaterial<IsotropicMaterial>("mat1", 210e9,0.0f);
-
-    model.constraint("EINSPANNUNG", 0,0,0);
-
-    model.applyLoad(399, 0,1000000,0);
-    model.applyLoad(398, 0,1000000,0);
-    model.applyLoad(397, 0,1000000,0);
-    model.applyLoad(396, 0,1000000,0);
-
-    model.solidSection("EALL", "mat1");
-    model.numerateUnconstrainedNodes();
-    ListedMatrix res{model.buildReducedStiffnessMatrix()};
-    DenseMatrix load{model.buildReducedLoadVector(res)};
-    SparseMatrix mat{res};
-
-    auto solution =  conjugate_gradient(mat, load);
-    std::cout << solution << std::endl;
-
-
-//    std::cout << solution << std::endl;
-
+//    Model model{8,1};
 //
-//    std::cout << mat.getM() << std::endl;
-//    QuickMatrix<108,108> dense{};
-//    for(int i = 0; i < 108; i++){
-//        for(int n = 0; n < 108; n++){
-//            dense(i,n) = mat(i,n);
-//        }
+//    model.activeNodeSet("EINSPANNUNG");
+//    for(int i = 0; i < 2; i++){
+//        model.addNode((float)i,0.0f,0.0f);
+//        model.addNode((float)i,1.0f,0.0f);
+//        model.addNode((float)i,1.0f,1.0f);
+//        model.addNode((float)i,0.0f,1.0f);
+//        model.activeNodeSet("NORMAL");
 //    }
-//    Precision det = 0;
-//    auto inv = inverse(dense, det);
-//    std::cout << "--------------------------------" << std::endl;
-//    std::cout << det << std::endl;
-//    std::cout << DenseMatrix(inv) * load << std::endl;
+//
+//    for(int i = 0; i < 1; i++){
+//        model.addElement<Iso3DHex8>(i * 4 + 0,
+//                                    i * 4 + 1,
+//                                    i * 4 + 2,
+//                                    i * 4 + 3,
+//                                    i * 4 + 4,
+//                                    i * 4 + 5,
+//                                    i * 4 + 6,
+//                                    i * 4 + 7);
+//    }
+//
+//
+//    model.addMaterial<IsotropicMaterial>("mat1", 210e9,0.0f);
+//
+//    model.constraint("EINSPANNUNG", 0,0,0);
+//    model.constraint(7, 0.1,NONE,NONE);
+//
+//    model.solidSection("EALL", "mat1");
+//    model.numerateUnconstrainedNodes();
+//    auto mat{model.buildReducedStiffnessMatrix()};
+//    auto load{model.buildReducedLoadVector()};
+//    std::cout << load << std::endl;
+//    std::cout << mat << std::endl;
+//    auto solution = conjugate_gradient(mat, load);
+//
+//    model.postProcessDisplacements(solution);
+//    std::cout << model.node_data[DISPLACEMENT] << std::endl;
+
+    Reader reader{};
+    reader.read("../test.inp");
 
 
     return 0;

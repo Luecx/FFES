@@ -1,6 +1,20 @@
-//
-// Created by Luecx on 05.09.2021.
-//
+/****************************************************************************************************
+ *                                                                                                  *
+ *                                                FFES                                              *
+ *                                          by. Finn Eggers                                         *
+ *                                                                                                  *
+ *                    FFESis free software: you can redistribute it and/or modify                   *
+ *                it under the terms of the GNU General Public License as published by              *
+ *                 the Free Software Foundation, either version 3 of the License, or                *
+ *                                (at your option) any later version.                               *
+ *                       FFESis distributed in the hope that it will be useful,                     *
+ *                   but WITHOUT ANY WARRANTY; without even the implied warranty of                 *
+ *                   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                  *
+ *                            GNU General Public License for more details.                          *
+ *                 You should have received a copy of the GNU General Public License                *
+ *                   along with FFES.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                                                  *
+ ****************************************************************************************************/
 #include "Iso2DQuad4.h"
 
 #include "../assert/Error.h"
@@ -76,8 +90,8 @@ DenseMatrix Iso2DQuad4::computeLocalStiffness() {
         auto inv = inverse2x2(jacobian, det);
 
         // error handling
-        ERROR(det > 0, NEGATIVE_JACOBIAN);
-        ERROR(material, NO_MATERIAL_ASSIGNED);
+        ERROR(det > 0, NEGATIVE_JACOBIAN, det);
+        ERROR(material, NO_MATERIAL_ASSIGNED, 0);
 
         // compute derivatives with respect to x,y
         auto B_help = inv * local_shape_derivative;

@@ -14,6 +14,7 @@ add_executable(FEM
                                                 src/model/solidSection.cpp
                                                 src/model/setManagment.cpp
                                                 src/model/loadManagment.cpp
+                                                src/model/postProcessDisplacements.cpp
         src/model/constraintManagment.cpp
         src/entity/Iso2DTri3.h                  src/entity/Iso2DTri3.cpp
         src/entity/Iso2DQuad4.h                 src/entity/Iso2DQuad4.cpp
@@ -22,8 +23,6 @@ add_executable(FEM
         src/matrix/Inverse.h
         src/matrix/QuickMatrix.h
         src/matrix/Matrix.h
-        src/matrix/ListedMatrix.h               src/matrix/ListedMatrix.cpp
-        src/matrix/SparseMatrix.h               src/matrix/SparseMatrix.cpp
         src/reader/Reader.h
         src/system/Step.h
         src/system/System.h
@@ -35,7 +34,7 @@ add_executable(FEM
         src/material/IsotropicMaterial.h        src/material/IsotropicMaterial.cpp
         src/core/Set.h                          src/core/Set.cpp
         src/core/defs.h
-        src/integration/Quadrature.h src/solver/CG.cpp src/solver/CG.h)
+        src/integration/Quadrature.h src/solver/CG.cpp src/solver/CG.h src/reader/LineType.h src/reader/LineData.h)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wshadow")

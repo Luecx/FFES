@@ -17,7 +17,7 @@
  ****************************************************************************************************/
 #include "Model.h"
 
-ID Model::activeNodeSet(const std::string& name) {
+ID Model::activateNodeSet(const std::string& name) {
     ID id = getNodeSetID(name);
     if(id == -1){
         this->node_sets.push_back(Set{name});
@@ -28,7 +28,7 @@ ID Model::activeNodeSet(const std::string& name) {
         return id;
     }
 }
-ID Model::activeElementSet(const std::string& name) {
+ID Model::activateElementSet(const std::string& name) {
     ID id = getElementSetID(name);
     if(id == -1){
         this->element_sets.push_back(Set{name});

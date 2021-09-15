@@ -26,11 +26,11 @@ Eigen::SparseMatrix<Precision> Model::buildReducedStiffnessMatrix() {
     ASSERT(this->node_data[BOUNDARY_IMPLIED_DISPLACEMENT_FORCE].isInitialised());
     ASSERT(this->node_data[BOUNDARY_DISPLACEMENT].isInitialised());
 
-//    // allocate data to store nodal forced due to forced displacements
-//    this->node_data[BOUNDARY_IMPLIED_DISPLACEMENT_FORCE].init(
-//        this->nodal_dimension * this->node_count, node_count);
-
     for (auto h : elements) {
+
+        // ignore null elements
+        if(h == nullptr) continue;
+
         auto mat        = h->computeLocalStiffness();
         auto el_n_count = h->nodeCount();
         auto node_ids   = h->nodeIDS();

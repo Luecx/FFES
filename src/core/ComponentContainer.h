@@ -28,6 +28,11 @@ template<typename C> struct ComponentContainerSub{
     C& operator[](int sub_index){
         return data[sub_index];
     }
+
+    ComponentContainerSub<C>& operator=(C value){
+        data[0] = value;
+        return *this;
+    }
 };
 
 template<typename C> struct ComponentContainer {

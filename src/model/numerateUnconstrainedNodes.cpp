@@ -26,18 +26,26 @@ ID Model::numerateUnconstrainedNodes() {
      */
 
     // make sure to reallocate if needed
-    node_data[REDUCED_STIFFNESS_INDEX  ].init(node_count * 3, node_count);
+    node_data[REDUCED_STIFFNESS_INDEX  ]
+        .init(max_node_count * nodal_dimension, max_node_count)
+        .even(nodal_dimension);
 
     // incrementally count IDS
     int ids = 0;
 
+    ASSERT(this->node_data[USED                   ].isInitialised());
     ASSERT(this->node_data[BOUNDARY_IS_CONSTRAINED].isInitialised());
     ASSERT(this->node_data[BOUNDARY_DISPLACEMENT  ].isInitialised());
 
     // check each node and if its constrained, if so remove those indices
-    for(int i = 0; i < node_count; i++){
-        node_data[REDUCED_STIFFNESS_INDEX].setIndexIncremental(i, nodal_dimension);
+    for(int i = 0; i < max_node_count; i++){
+        // dont numerate if its not used
+        if(node_data[USED][i][0] == 0) continue;
+
+        // go over each dimension of the node
         for(int j = 0; j < nodal_dimension; j++){
+
+            // if its not constrained, assign an id
             if(this->node_data[BOUNDARY_IS_CONSTRAINED][i][j] == 0){
                 this->node_data[REDUCED_STIFFNESS_INDEX][i][j] = ids++;
             }else{

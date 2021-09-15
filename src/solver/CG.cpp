@@ -23,6 +23,7 @@ Eigen::VectorXd conjugate_gradient(const Eigen::SparseMatrix<Precision>& matrix,
 
 
     Eigen::VectorXd sol(b.size()), t(b.size());
+    std::cout << "Attempting to solve matrix: " << b.size() << "x" << b.size() << std::endl;
 
     Eigen::ConjugateGradient<
         Eigen::SparseMatrix<Precision>,

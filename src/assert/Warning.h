@@ -15,32 +15,22 @@
  *                   along with FFES.  If not, see <http://www.gnu.org/licenses/>.                  *
  *                                                                                                  *
  ****************************************************************************************************/
+//
+// Created by Luecx on 15.09.2021.
+//
 
-#ifndef FEM_SRC_MATERIAL_ISOTROPICMATERIAL_H_
-#define FEM_SRC_MATERIAL_ISOTROPICMATERIAL_H_
+#ifndef FEM_SRC_ASSERT_WARNING_H_
+#define FEM_SRC_ASSERT_WARNING_H_
 
-#include "Material.h"
+#define WARNING(expr, value)                                                                 \
+{                                                                                                \
+    if (!static_cast<bool>(expr)) {                                                              \
+        std::cout << "[WARNING] in expression "            << (#expr) << std::endl;              \
+        std::cout << "   value: " << value                 << std::endl;                         \
+        std::cout << "    file: " << __FILE__              << std::endl;                         \
+        std::cout << "    line: " << __LINE__              << std::endl;                         \
+        std::cout << "    func: " << FUNCTION_NAME         << std::endl;                         \
+    }                                                                                            \
+}
 
-struct IsotropicMaterial : Material {
-
-    private:
-
-    Precision youngs_module;
-    Precision poisson;
-
-    QuickMatrix<3,3> mat_matrix_2d{};
-    QuickMatrix<6,6> mat_matrix_3d{};
-
-    public:
-    IsotropicMaterial(Precision youngs_module, Precision poisson);
-
-    private:
-    void update();
-
-    public:
-    QuickMatrix<3, 3> getMaterialMatrix2D() override;
-    QuickMatrix<6, 6> getMaterialMatrix3D() override;
-
-};
-
-#endif    // FEM_SRC_MATERIAL_ISOTROPICMATERIAL_H_
+#endif    // FEM_SRC_ASSERT_WARNING_H_

@@ -26,9 +26,14 @@
 
 class System {
 
-    private:
-//    MemoryManager      memory_manager {};
+    public:
+    Model model;
     std::vector<Step*> steps {};
+
+
+    public:
+    System(int max_nodes, int max_elements) : model(max_nodes, max_elements){}
+
 };
 
 #endif    // FEM_SRC_SYSTEM_SYSTEM_H_

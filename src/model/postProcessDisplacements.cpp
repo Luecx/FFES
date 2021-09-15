@@ -18,11 +18,18 @@
 #include "Model.h"
 
 void Model::postProcessDisplacements(const Eigen::VectorXd& displacement) {
-    for(int i = 0; i < node_count; i++){
+    for(int i = 0; i < max_node_count; i++){
+
+        // dont create a load vector for unused nodes
+        if(node_data[USED][i][0] == 0) continue;
+
+        // iterate over each dimension
         for(int d = 0; d < nodal_dimension; d++){
 
+            // get the dof id
             auto dof_id = node_data[REDUCED_STIFFNESS_INDEX][i][d];
 
+            // check if its constrained
             if(dof_id < 0){
                 node_data[DISPLACEMENT][i][d] = node_data[BOUNDARY_DISPLACEMENT][i][d];
             }else{

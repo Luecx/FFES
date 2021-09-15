@@ -51,7 +51,9 @@ DenseMatrix Iso2DTri3::computeLocalStiffness() {
     QuickMatrix<2, 2> inverseJacobian = inverse(jacobian, det);
 
     ERROR(det > 0, NEGATIVE_JACOBIAN, det);
-    ERROR(material, NO_MATERIAL_ASSIGNED, 0);
+    ERROR(material, MATERIAL_HAS_NO_ELASTICITY, 0);
+    ERROR(material->getElasticity(), NO_MATERIAL_ASSIGNED, 0);
+
 
     auto              BHelp           = inverseJacobian * G;
 
@@ -69,7 +71,7 @@ DenseMatrix Iso2DTri3::computeLocalStiffness() {
     B(2, 4) = BHelp(1, 2);
     B(2, 5) = BHelp(0, 2);
 
-    QuickMatrix<6, 6> stiffness = (!B) * material->getMaterialMatrix2D() * B;
+    QuickMatrix<6, 6> stiffness = (!B) * material->getElasticity()->getMaterialMatrix2D() * B;
     // 0.5 due to integration over isoparametric triangle is 0.5
     stiffness *= 1 * 0.5 * det;
 

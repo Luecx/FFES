@@ -28,8 +28,11 @@ DenseMatrix Iso3DHex8::computeLocalStiffness() {
 
     QuickMatrix<24, 24> stiffness {};
 
+    ERROR(material, MATERIAL_HAS_NO_ELASTICITY, 0);
+    ERROR(material->getElasticity(), NO_MATERIAL_ASSIGNED, 0);
+
     DenseMatrix         integration_points = integrate<ISO_HEX, LINEAR>();
-    auto                mat_matrix         = material->getMaterialMatrix3D();
+    auto                mat_matrix         = material->getElasticity()->getMaterialMatrix3D();
 
     QuickMatrix<8, 3>   node_coords {};
 
@@ -87,7 +90,6 @@ DenseMatrix Iso3DHex8::computeLocalStiffness() {
 
         // error handling
         ERROR(det > 0, NEGATIVE_JACOBIAN, det);
-        ERROR(material, NO_MATERIAL_ASSIGNED, 0);
 
         // compute derivatives with respect to x,y
         auto B_help = inv * local_shape_derivative;

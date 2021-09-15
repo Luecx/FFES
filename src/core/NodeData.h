@@ -25,6 +25,7 @@
 #include <ostream>
 
 enum NodeDataEntries{
+    USED,                                   // check if used by any element
     POSITION,                               // coordinates
     VELOCITY,                               // coordinates
     BOUNDARY_IS_CONSTRAINED,                // 1 if boundary displacement is constrained (see below)

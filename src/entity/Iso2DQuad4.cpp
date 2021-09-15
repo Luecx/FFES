@@ -26,8 +26,11 @@ DenseMatrix Iso2DQuad4::computeLocalStiffness() {
 
     QuickMatrix<8, 8> stiffness {};
 
+    ERROR(material, MATERIAL_HAS_NO_ELASTICITY, 0);
+    ERROR(material->getElasticity(), NO_MATERIAL_ASSIGNED, 0);
+
     DenseMatrix       integration_points = integrate<ISO_QUAD, LINEAR>();
-    auto              mat_matrix         = material->getMaterialMatrix2D();
+    auto              mat_matrix         = material->getElasticity()->getMaterialMatrix2D();
 
     auto node1 = node_ids[0];
     auto node2 = node_ids[1];
@@ -91,7 +94,6 @@ DenseMatrix Iso2DQuad4::computeLocalStiffness() {
 
         // error handling
         ERROR(det > 0, NEGATIVE_JACOBIAN, det);
-        ERROR(material, NO_MATERIAL_ASSIGNED, 0);
 
         // compute derivatives with respect to x,y
         auto B_help = inv * local_shape_derivative;

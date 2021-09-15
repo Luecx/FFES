@@ -3,7 +3,7 @@
 #include "src/entity/Iso2DTri3.h"
 #include "src/entity/Iso3DHex8.h"
 #include "src/integration/Quadrature.h"
-#include "src/material/IsotropicMaterial.h"
+#include "src/material/IsotropicElasticity.h"
 #include "src/matrix/DenseMatrix.h"
 #include "src/matrix/Inverse.h"
 #include "src/matrix/Matrix.h"
@@ -42,19 +42,40 @@ int stopMeasure() {
 }
 int main() {
 
-//    Model model{8,1};
-//
-//    model.activeNodeSet("EINSPANNUNG");
-//    for(int i = 0; i < 2; i++){
-//        model.addNode((float)i,0.0f,0.0f);
-//        model.addNode((float)i,1.0f,0.0f);
-//        model.addNode((float)i,1.0f,1.0f);
-//        model.addNode((float)i,0.0f,1.0f);
-//        model.activeNodeSet("NORMAL");
+
+    Reader reader{"../bin/test.inp"};
+    auto system = reader.read();
+
+    system->model.constraint(0,0,0,0);
+    system->model.constraint(1,0,0,0);
+    system->model.constraint(2,0,0,0);
+    system->model.constraint(3,0,0,0);
+    system->model.applyLoad(4,10,10,10);
+
+    auto k = system->model.buildReducedStiffnessMatrix();
+    auto f = system->model.buildReducedLoadVector();
+    auto solution = conjugate_gradient(k, f);
+    system->model.postProcessDisplacements(solution);
+    std::cout << system->model.node_data[DISPLACEMENT] << std::endl;
+
+    delete system;
+
+
+//    Model model{100,100};
+//    model.activateNodeSet("EINSPANNUNG");
+//    ID nodeCount = 0;
+//    ID elementCount = 0;
+//    for(int i = 0; i < 3; i++){
+//        model.setNode(nodeCount++,(float)i,0.0f,0.0f);
+//        model.setNode(nodeCount++,(float)i,1.0f,0.0f);
+//        model.setNode(nodeCount++,(float)i,1.0f,1.0f);
+//        model.setNode(nodeCount++,(float)i,0.0f,1.0f);
+//        model.activateNodeSet("NORMAL");
 //    }
 //
 //    for(int i = 0; i < 1; i++){
-//        model.addElement<Iso3DHex8>(i * 4 + 0,
+//        model.setElement<Iso3DHex8>(elementCount ++,
+//                                    i * 4 + 0,
 //                                    i * 4 + 1,
 //                                    i * 4 + 2,
 //                                    i * 4 + 3,
@@ -65,24 +86,22 @@ int main() {
 //    }
 //
 //
-//    model.addMaterial<IsotropicMaterial>("mat1", 210e9,0.0f);
+//    model.addMaterial("mat1");
+//    model.materials[model.getMaterialID("mat1")]->setElasticity<IsotropicElasticity>(210000,0.3);
 //
 //    model.constraint("EINSPANNUNG", 0,0,0);
-//    model.constraint(7, 0.1,NONE,NONE);
+//    model.applyLoad(4, 0,10,0);
 //
 //    model.solidSection("EALL", "mat1");
 //    model.numerateUnconstrainedNodes();
 //    auto mat{model.buildReducedStiffnessMatrix()};
 //    auto load{model.buildReducedLoadVector()};
-//    std::cout << load << std::endl;
 //    std::cout << mat << std::endl;
+//
 //    auto solution = conjugate_gradient(mat, load);
 //
 //    model.postProcessDisplacements(solution);
-//    std::cout << model.node_data[DISPLACEMENT] << std::endl;
 
-    Reader reader{};
-    reader.read("../test.inp");
 
 
     return 0;

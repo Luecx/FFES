@@ -15,50 +15,31 @@
  *                   along with FFES.  If not, see <http://www.gnu.org/licenses/>.                  *
  *                                                                                                  *
  ****************************************************************************************************/
+//
+// Created by Luecx on 16.09.2021.
+//
+#include "LoadCase.h"
 
-#ifndef FEM_SRC_CORE_NODEDATA_H_
-#define FEM_SRC_CORE_NODEDATA_H_
+void LoadCase::reconstructBoundary(){
+    if(previous_load_case == nullptr) return;
 
-#include "ComponentContainer.h"
-#include "defs.h"
+//  BOUNDARY_IS_CONSTRAINED_NEXT_CASE,
+//  BOUNDARY_IS_CONSTRAINED,
+//  BOUNDARY_DISPLACEMENT_NEXT_CASE,
+//  BOUNDARY_DISPLACEMENT,
+//  BOUNDARY_FORCE_NEXT_CASE,
+//  BOUNDARY_FORCE,
 
-#include <ostream>
+    node_data[BOUNDARY_IS_CONSTRAINED]
+        = node_data[BOUNDARY_IS_CONSTRAINED_NEXT_CASE]
+        = previous_load_case->node_data[BOUNDARY_IS_CONSTRAINED_NEXT_CASE];
 
-enum NodeDataEntries{
-    USED,                                   // check if used by any element
-    POSITION,                               // coordinates
+    node_data[BOUNDARY_DISPLACEMENT]
+        = node_data[BOUNDARY_DISPLACEMENT_NEXT_CASE]
+        = previous_load_case->node_data[BOUNDARY_DISPLACEMENT_NEXT_CASE];
 
-    // LOAD CASE DATA
-    BOUNDARY_IS_CONSTRAINED_NEXT_CASE,      // contains information about the bc for the next case
-    BOUNDARY_IS_CONSTRAINED,                // 1 if boundary displacement is constrained (see below)
-    BOUNDARY_DISPLACEMENT_NEXT_CASE,        // contains information about the bc for the next case
-    BOUNDARY_DISPLACEMENT,                  // boundary displacement, relevant if BOUNDARY_IS_CONSTRAINED = 1
-    BOUNDARY_FORCE_NEXT_CASE,               // contains information about the bc for the next case
-    BOUNDARY_FORCE,                         // boundary force, not relevant if constrained
+    node_data[BOUNDARY_FORCE]
+        = node_data[BOUNDARY_FORCE_NEXT_CASE]
+        = previous_load_case->node_data[BOUNDARY_FORCE_NEXT_CASE];
 
-    BOUNDARY_IMPLIED_DISPLACEMENT_FORCE,    // force implied due to displacements
-    DISPLACEMENT,                           // displacement in final solution
-    STRESS,
-    N_MAX_NODE_FLOAT_ENTRIES
-};
-
-enum NodeDataIntegerEntries{
-    REDUCED_STIFFNESS_INDEX,
-    N_MAX_NODE_INT_ENTRIES
-};
-
-struct NodeData{
-    ComponentContainer<Precision> float_data[N_MAX_NODE_FLOAT_ENTRIES]{};
-    ComponentContainer<int>       int_data  [N_MAX_NODE_INT_ENTRIES]{};
-
-    ComponentContainer<Precision>& operator[](NodeDataEntries entry){
-        return float_data[entry];
-    }
-
-    ComponentContainer<int>&       operator[](NodeDataIntegerEntries entry){
-        return int_data[entry];
-    }
-
-};
-
-#endif    // FEM_SRC_CORE_NODEDATA_H_
+}

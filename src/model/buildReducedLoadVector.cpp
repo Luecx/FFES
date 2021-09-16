@@ -16,14 +16,17 @@
  *                                                                                                  *
  ****************************************************************************************************/
 #include "Model.h"
-Eigen::VectorXd Model::buildReducedLoadVector() {
-    ID           max_id = this->numerateUnconstrainedNodes();
+#include "../system/LoadCase.h"
+
+Eigen::VectorXd Model::buildReducedLoadVector(LoadCase* load_case) {
+    ID           max_id = this->numerateUnconstrainedNodes(load_case);
 
     Eigen::VectorXd  nodal_forces {max_id, 1};
 
-    ASSERT(node_data[USED                   ].isInitialised());
-    ASSERT(node_data[BOUNDARY_FORCE         ].isInitialised());
-    ASSERT(node_data[REDUCED_STIFFNESS_INDEX].isInitialised());
+    ASSERT(           node_data[USED                               ].isInitialised());
+    ASSERT(load_case->node_data[BOUNDARY_FORCE                     ].isInitialised());
+    ASSERT(           node_data[REDUCED_STIFFNESS_INDEX            ].isInitialised());
+    ASSERT(           node_data[BOUNDARY_IMPLIED_DISPLACEMENT_FORCE].isInitialised());
 
     // first apply nodal forces
     for(int i = 0; i < max_node_count; i++){
@@ -41,7 +44,7 @@ Eigen::VectorXd Model::buildReducedLoadVector() {
             if (dof_id1 < 0) continue;
 
             // compute the nodal force
-            nodal_forces(dof_id1) = node_data[BOUNDARY_FORCE][i][j]
+            nodal_forces(dof_id1) = load_case->node_data[BOUNDARY_FORCE][i][j]
                                   + node_data[BOUNDARY_IMPLIED_DISPLACEMENT_FORCE][i][j];
         }
     }

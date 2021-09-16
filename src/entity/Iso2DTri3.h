@@ -29,6 +29,7 @@ struct Iso2DTri3 : public Element {
     Iso2DTri3(int node_1, int node_2, int node_3);
 
     DenseMatrix       computeLocalStiffness() override;
+    DenseMatrix       extrapolate(DenseMatrix& integration_point_results) override;
     QuickMatrix<2, 2> computeJacobian();
 
     int               nodeDOF() override;

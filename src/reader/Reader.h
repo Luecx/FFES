@@ -169,6 +169,25 @@ class Reader {
         getSystem()->model.solidSection(element_set, material_name);
         nextLine();
     }
+    void read_LOADCASE(){
+        system->addLoadCase();
+        nextLine();
+    }
+    void read_BOUNDARY(){
+        nextLine();
+        bool is_temporary = line_data.requireValue("OP") == "TEMPORARY";
+        while(line_data.line_type != END_OF_FILE || line_data.line_type == HEADER){
+            if(line_data.line_type == COMMENT) continue;
+            if(line_data.csv_count < 3) continue;
+            auto dim = std::stoi(line_data.csv[1]);
+            auto dis = std::stof(line_data.csv[2]);
+            if(system->model.getElementSetID(line_data.csv[0]) >= 0){
+                system->getLoadCase()->constraint(line_data.csv[0], dim, dis, is_temporary);
+            }else{
+                system->getLoadCase()->constraint(std::stoi(line_data.csv[0]), dim, dis, is_temporary);
+            }
+        }
+    }
 
     void allocate() {
 
@@ -248,7 +267,11 @@ class Reader {
                     read_MATERIAL();
                 } else if (header_name == "SOLIDSECTION") {
                     read_SOLIDSECTION();
-                }else {
+                } else if (header_name == "LOADCASE") {
+                    read_LOADCASE();
+                } else if (header_name == "BOUNDARY") {
+                    read_BOUNDARY();
+                } else {
                     nextLine();
                     WARNING(false, "Command not known: " << header_name);
                 }

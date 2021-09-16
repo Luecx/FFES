@@ -19,20 +19,31 @@
 #ifndef FEM_SRC_SYSTEM_SYSTEM_H_
 #define FEM_SRC_SYSTEM_SYSTEM_H_
 
-#include "Step.h"
-
+#include "LoadCase.h"
 
 #include <vector>
 
-class System {
+struct System {
 
     public:
     Model model;
-    std::vector<Step*> steps {};
+    std::vector<LoadCase*> load_cases {};
 
 
     public:
-    System(int max_nodes, int max_elements) : model(max_nodes, max_elements){}
+    System(int max_nodes, int max_elements) : model(max_nodes, max_elements){
+        // add base load case
+        addLoadCase();
+    }
+
+    void addLoadCase(){
+        load_cases.push_back(new LoadCase(&model, getLoadCase()));
+    }
+
+    LoadCase* getLoadCase(){
+        if(load_cases.size() == 0) return nullptr;
+        return load_cases.back();
+    }
 
 };
 

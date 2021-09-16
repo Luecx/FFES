@@ -105,6 +105,10 @@ QuickMatrix<2, 2> Iso2DTri3::computeJacobian() {
 
     return jacobian;
 }
+DenseMatrix Iso2DTri3::extrapolate(DenseMatrix& integration_point_results) {
+    return integration_point_results;
+}
 int  Iso2DTri3::nodeCount() { return 3; }
 int* Iso2DTri3::nodeIDS() { return node_ids; }
 int  Iso2DTri3::nodeDOF() { return 2; }
+

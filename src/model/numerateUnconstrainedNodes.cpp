@@ -16,26 +16,20 @@
  *                                                                                                  *
  ****************************************************************************************************/
 #include "Model.h"
-ID Model::numerateUnconstrainedNodes() {
+#include "../system/LoadCase.h"
 
-    /**
-     * BOUNDARY_IS_CONSTRAINED,        // 1 if boundary displacement is constrained (see below)
-     * BOUNDARY_DISPLACEMENT,          // boundary displacement, relevant if BOUNDARY_IS_CONSTRAINED = 1
-     *
-     * REDUCED_STIFFNESS_INDEX,
-     */
+ID Model::numerateUnconstrainedNodes(LoadCase* load_case) {
 
     // make sure to reallocate if needed
-    node_data[REDUCED_STIFFNESS_INDEX  ]
+    node_data[REDUCED_STIFFNESS_INDEX]
         .init(max_node_count * nodal_dimension, max_node_count)
         .even(nodal_dimension);
 
     // incrementally count IDS
     int ids = 0;
 
-    ASSERT(this->node_data[USED                   ].isInitialised());
-    ASSERT(this->node_data[BOUNDARY_IS_CONSTRAINED].isInitialised());
-    ASSERT(this->node_data[BOUNDARY_DISPLACEMENT  ].isInitialised());
+    ASSERT(this     ->node_data[USED                   ].isInitialised());
+    ASSERT(load_case->node_data[BOUNDARY_IS_CONSTRAINED].isInitialised());
 
     // check each node and if its constrained, if so remove those indices
     for(int i = 0; i < max_node_count; i++){
@@ -46,7 +40,7 @@ ID Model::numerateUnconstrainedNodes() {
         for(int j = 0; j < nodal_dimension; j++){
 
             // if its not constrained, assign an id
-            if(this->node_data[BOUNDARY_IS_CONSTRAINED][i][j] == 0){
+            if(load_case->node_data[BOUNDARY_IS_CONSTRAINED][i][j] == 0){
                 this->node_data[REDUCED_STIFFNESS_INDEX][i][j] = ids++;
             }else{
                 this->node_data[REDUCED_STIFFNESS_INDEX][i][j] = -1;

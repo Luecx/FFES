@@ -16,15 +16,15 @@
  *                                                                                                  *
  ****************************************************************************************************/
 #include "Model.h"
-Eigen::SparseMatrix<Precision> Model::buildReducedStiffnessMatrix() {
-    ID           max_id = this->numerateUnconstrainedNodes();
+#include "../system/LoadCase.h"
+Eigen::SparseMatrix<Precision> Model::buildReducedStiffnessMatrix(LoadCase* load_case) {
+    ID           max_id = this->numerateUnconstrainedNodes(load_case);
 
     std::vector<Eigen::Triplet<Precision>> indices{};
 
-
-    ASSERT(this->node_data[REDUCED_STIFFNESS_INDEX].isInitialised());
-    ASSERT(this->node_data[BOUNDARY_IMPLIED_DISPLACEMENT_FORCE].isInitialised());
-    ASSERT(this->node_data[BOUNDARY_DISPLACEMENT].isInitialised());
+    ASSERT(this     ->node_data[REDUCED_STIFFNESS_INDEX            ].isInitialised());
+    ASSERT(this     ->node_data[BOUNDARY_IMPLIED_DISPLACEMENT_FORCE].isInitialised());
+    ASSERT(load_case->node_data[BOUNDARY_DISPLACEMENT              ].isInitialised());
 
     for (auto h : elements) {
 
@@ -52,7 +52,8 @@ Eigen::SparseMatrix<Precision> Model::buildReducedStiffnessMatrix() {
                         if (dof_id1 < 0 || dof_id2 < 0) {
                             if(dof_id1 >= 0){
                                 this->node_data[BOUNDARY_IMPLIED_DISPLACEMENT_FORCE][node_id1][dim1] -=
-                                    mat(idx * n_dof + dim1, idy * n_dof + dim2) * this->node_data[BOUNDARY_DISPLACEMENT][node_id2][dim2];
+                                    mat(idx * n_dof + dim1, idy * n_dof + dim2) *
+                                    load_case->node_data[BOUNDARY_DISPLACEMENT][node_id2][dim2];
                             }
                             continue;
                         }
@@ -63,7 +64,7 @@ Eigen::SparseMatrix<Precision> Model::buildReducedStiffnessMatrix() {
         }
     }
 
-    Eigen::SparseMatrix<Precision> matrix{max_id, max_id};
+    Eigen::SparseMatrix<Precision> matrix{max_id,max_id};
     matrix.setFromTriplets(indices.begin(), indices.end());
     return matrix;
 }

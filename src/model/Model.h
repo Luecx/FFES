@@ -29,6 +29,8 @@
 
 #include <vector>
 
+struct LoadCase;
+
 struct Model {
 
     NodeData               node_data {};
@@ -54,11 +56,7 @@ struct Model {
 
         node_data[USED                               ].init(max_node_count * 1, max_node_count).even(1);
         node_data[POSITION                           ].init(max_node_count * 3, max_node_count).even(3);
-        node_data[BOUNDARY_IS_CONSTRAINED            ].init(max_node_count * 3, max_node_count).even(3);
-        node_data[BOUNDARY_DISPLACEMENT              ].init(max_node_count * 3, max_node_count).even(3);
-        node_data[BOUNDARY_FORCE                     ].init(max_node_count * 3, max_node_count).even(3);
         node_data[BOUNDARY_IMPLIED_DISPLACEMENT_FORCE].init(max_node_count * 3, max_node_count).even(3);
-        node_data[DISPLACEMENT                       ].init(max_node_count * 3, max_node_count).even(3);
         node_data[STRESS                             ].init(max_node_count * 6, max_node_count).even(6);
 
         elements.resize(max_element_count);
@@ -80,16 +78,7 @@ struct Model {
     }
 
     // functions to add nodes/elements
-    void setNode(ID id, Precision x, Precision y, Precision z=(Precision)0){
-
-        ERROR(id < max_node_count, PARSING_INVALID_NODE_ID, "id is larger than max_node_count");
-
-        node_data[POSITION][id][0] = x;
-        node_data[POSITION][id][1] = y;
-        node_data[POSITION][id][2] = z;
-
-        this->node_sets[active_node_set].ids.push_back(id);
-    }
+    void setNode(ID id, Precision x, Precision y, Precision z=(Precision)0);
     template<typename T, typename... Args>
     void setElement(ID id, Args&&... args){
         auto el = new T{args...};
@@ -102,6 +91,7 @@ struct Model {
         this->elements[id] = el;
         this->elements[id]->node_data = &node_data;
 
+        this->element_sets[0                 ].ids.push_back(id);
         this->element_sets[active_element_set].ids.push_back(id);
 
         for(int i = 0; i < static_cast<Element*>(el)->nodeCount(); i++){
@@ -110,18 +100,8 @@ struct Model {
     }
 
     // functions to manage materials
-    ID addMaterial(const std::string& name){
-        this->materials.push_back(new Material(name));
-        return this->materials.size()-1;
-    }
-    ID getMaterialID(const std::string& name){
-        for(int i = 0; i < (int)materials.size(); i++){
-            if(materials[i]->name == name){
-                return i;
-            }
-        }
-        return -1;
-    }
+    ID addMaterial(const std::string& name);
+    ID getMaterialID(const std::string& name);
 
     // functions to manage sets
     ID activateNodeSet(const std::string& name);
@@ -129,40 +109,20 @@ struct Model {
     ID getNodeSetID(const std::string& name);
     ID getElementSetID(const std::string& name);
 
-    // functions to constraint nodes
-    void constraint(const std::string& set,
-                    Precision x=NAN,
-                    Precision y=NAN,
-                    Precision z=NAN);
-    void constraint(int node_id,
-                    Precision x=NAN,
-                    Precision y=NAN,
-                    Precision z=NAN);
-
-    // functions to apply loads to nodes
-    void applyLoad(const std::string& set,
-                    Precision x=NAN,
-                    Precision y=NAN,
-                    Precision z=NAN);
-    void applyLoad(int node_id,
-                    Precision x=NAN,
-                    Precision y=NAN,
-                    Precision z=NAN);
-
     // assign materials to elements
     void solidSection(const std::string& set, const std::string& material);
 
     // build global stiffness matrix
-    Eigen::SparseMatrix<Precision> buildReducedStiffnessMatrix();
+    Eigen::SparseMatrix<Precision> buildReducedStiffnessMatrix(LoadCase* load_case);
 
     // build load vector
-    Eigen::VectorXd buildReducedLoadVector();
+    Eigen::VectorXd buildReducedLoadVector(LoadCase* load_case);
 
     // compute displacements for every node
     void postProcessDisplacements(const Eigen::VectorXd& displacement);
 
     // numerate unconstrained vertices
-    ID numerateUnconstrainedNodes();
+    ID numerateUnconstrainedNodes(LoadCase* load_case);
 };
 
 

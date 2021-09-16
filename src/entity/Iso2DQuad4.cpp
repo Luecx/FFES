@@ -115,6 +115,13 @@ DenseMatrix Iso2DQuad4::computeLocalStiffness() {
     return DenseMatrix{stiffness};
 
 }
+
+DenseMatrix Iso2DQuad4::extrapolate(DenseMatrix& integration_point_results) {
+    //TODO
+    return integration_point_results;
+}
+
 int Iso2DQuad4::nodeCount() {return 4;}
 int* Iso2DQuad4::nodeIDS() { return node_ids; }
 int  Iso2DQuad4::nodeDOF() { return 2; }
+

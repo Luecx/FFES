@@ -32,7 +32,7 @@ enum Domain{
 };
 
 template<Domain domain, Order order>
-DenseMatrix integrate(){
+inline DenseMatrix integrate(){
     if constexpr (domain == ISO_TRI){
 
         if constexpr (order == LINEAR){

@@ -16,49 +16,17 @@
  *                                                                                                  *
  ****************************************************************************************************/
 
-#ifndef FEM_SRC_CORE_NODEDATA_H_
-#define FEM_SRC_CORE_NODEDATA_H_
+#include "Model.h"
 
-#include "ComponentContainer.h"
-#include "defs.h"
-
-#include <ostream>
-
-enum NodeDataEntries{
-    USED,                                   // check if used by any element
-    POSITION,                               // coordinates
-
-    // LOAD CASE DATA
-    BOUNDARY_IS_CONSTRAINED_NEXT_CASE,      // contains information about the bc for the next case
-    BOUNDARY_IS_CONSTRAINED,                // 1 if boundary displacement is constrained (see below)
-    BOUNDARY_DISPLACEMENT_NEXT_CASE,        // contains information about the bc for the next case
-    BOUNDARY_DISPLACEMENT,                  // boundary displacement, relevant if BOUNDARY_IS_CONSTRAINED = 1
-    BOUNDARY_FORCE_NEXT_CASE,               // contains information about the bc for the next case
-    BOUNDARY_FORCE,                         // boundary force, not relevant if constrained
-
-    BOUNDARY_IMPLIED_DISPLACEMENT_FORCE,    // force implied due to displacements
-    DISPLACEMENT,                           // displacement in final solution
-    STRESS,
-    N_MAX_NODE_FLOAT_ENTRIES
-};
-
-enum NodeDataIntegerEntries{
-    REDUCED_STIFFNESS_INDEX,
-    N_MAX_NODE_INT_ENTRIES
-};
-
-struct NodeData{
-    ComponentContainer<Precision> float_data[N_MAX_NODE_FLOAT_ENTRIES]{};
-    ComponentContainer<int>       int_data  [N_MAX_NODE_INT_ENTRIES]{};
-
-    ComponentContainer<Precision>& operator[](NodeDataEntries entry){
-        return float_data[entry];
+ID Model::addMaterial(const std::string& name) {
+    this->materials.push_back(new Material(name));
+    return this->materials.size()-1;
+}
+ID Model::getMaterialID(const std::string& name) {
+    for(int i = 0; i < (int)materials.size(); i++){
+        if(materials[i]->name == name){
+            return i;
+        }
     }
-
-    ComponentContainer<int>&       operator[](NodeDataIntegerEntries entry){
-        return int_data[entry];
-    }
-
-};
-
-#endif    // FEM_SRC_CORE_NODEDATA_H_
+    return -1;
+}

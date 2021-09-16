@@ -15,35 +15,58 @@
  *                   along with FFES.  If not, see <http://www.gnu.org/licenses/>.                  *
  *                                                                                                  *
  ****************************************************************************************************/
-#include "Model.h"
-void Model::constraint(const std::string& set,
-                Precision x,
-                Precision y,
-                Precision z){
 
-    ID node_set_id = getNodeSetID(set);
-    ASSERT(node_set_id >= 0);
+#ifndef FEM_SRC_INTEGRATION_EXTRAPOLATE_H_
+#define FEM_SRC_INTEGRATION_EXTRAPOLATE_H_
 
-    for(ID id:node_sets[node_set_id].ids){
-        constraint(id, x,y,z);
+#include "Quadrature.h"
+
+template<Domain domain, Order order>
+DenseMatrix extrapolate(){
+    if constexpr (domain == ISO_TRI){
+
+        if constexpr (order == LINEAR){
+            return DenseMatrix{3,1,
+                1,
+                1,
+                1};
+        }
+
+        if constexpr (order == QUADRATIC){
+            ERROR(false, NOT_YET_SUPPORTED, "not yet supported");
+        }
+
+        if constexpr (order == CUBIC){
+            ERROR(false, NOT_YET_SUPPORTED, "not yet supported");
+        }
+    }
+
+    if constexpr (domain == ISO_QUAD){
+
+        if constexpr (order == LINEAR){
+            return DenseMatrix{4,4,
+                1 + 0.5 * sqrt(3),   - 0.5          , 1 - 0.5 * sqrt(3),   - 0.5,
+                  - 0.5          , 1 + 0.5 * sqrt(3),   - 0.5          , 1 - 0.5 * sqrt(3),
+                1 - 0.5 * sqrt(3),   - 0.5          , 1 + 0.5 * sqrt(3),   - 0.5,
+                  - 0.5          , 1 - 0.5 * sqrt(3),   - 0.5          , 1 + 0.5 * sqrt(3)};
+        }
+
+        if constexpr (order == QUADRATIC){
+            ERROR(false, NOT_YET_SUPPORTED, "not yet supported");
+        }
+    }
+
+
+    if constexpr (domain == ISO_HEX){
+
+        if constexpr (order == LINEAR){
+            ERROR(false, NOT_YET_SUPPORTED, "not yet supported");
+        }
+
+        if constexpr (order == QUADRATIC){
+            ERROR(false, NOT_YET_SUPPORTED, "not yet supported");
+        }
     }
 }
-void Model::constraint(int node_id,
-                Precision x,
-                Precision y,
-                Precision z){
-    if(!std::isnan(x)){
-        node_data[BOUNDARY_IS_CONSTRAINED][node_id][0] = 1;
-        node_data[BOUNDARY_DISPLACEMENT  ][node_id][0] = x;
-    }
 
-    if(!std::isnan(y)){
-        node_data[BOUNDARY_IS_CONSTRAINED][node_id][1] = 1;
-        node_data[BOUNDARY_DISPLACEMENT  ][node_id][1] = y;
-    }
-
-    if(!std::isnan(z)){
-        node_data[BOUNDARY_IS_CONSTRAINED][node_id][2] = 1;
-        node_data[BOUNDARY_DISPLACEMENT  ][node_id][2] = z;
-    }
-}
+#endif    // FEM_SRC_INTEGRATION_EXTRAPOLATE_H_

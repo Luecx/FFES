@@ -31,7 +31,7 @@ struct Element {
     virtual ~Element() {}
 
     virtual DenseMatrix computeLocalStiffness() = 0;
-
+    virtual DenseMatrix extrapolate(DenseMatrix& integration_point_results) = 0;
 
     virtual int  nodeDOF() = 0;
     virtual int  nodeCount() = 0;

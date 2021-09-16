@@ -32,6 +32,7 @@ enum ErrorCodes {
     PARSING_INVALID_ELEMENT_ID,
     CANNOT_OPEN_FILE,
     ELEMENT_TYPE_NOT_KNOWN,
+    NOT_YET_SUPPORTED,
 };
 
 #define ERROR(expr, code, value)                                                                 \

@@ -122,3 +122,7 @@ DenseMatrix Iso3DHex8::computeLocalStiffness() {
 int  Iso3DHex8::nodeCount() { return 8; }
 int* Iso3DHex8::nodeIDS() { return node_ids; }
 int  Iso3DHex8::nodeDOF() { return 3; }
+
+DenseMatrix Iso3DHex8::extrapolate(DenseMatrix& integration_point_results) {
+    return integration_point_results;
+}

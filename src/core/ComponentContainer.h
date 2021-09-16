@@ -19,6 +19,7 @@
 #ifndef FEM_SRC_CORE_COMPONENTCONTAINER_H_
 #define FEM_SRC_CORE_COMPONENTCONTAINER_H_
 
+#include <cstring>
 #include <iomanip>
 #include <iostream>
 template<typename C> struct ComponentContainerSub{
@@ -89,6 +90,12 @@ template<typename C> struct ComponentContainer {
 
     ComponentContainerSub<C> operator[](int index){
         return ComponentContainerSub<C>{&data[indices[index]]};
+    }
+
+    ComponentContainer<C>& operator=(const ComponentContainer<C>& other){
+        std::memcpy(data   , other.data   , sizeof(C  ) * data_count);
+        std::memcpy(indices, other.indices, sizeof(int) * index_count);
+        return *this;
     }
 
     friend std::ostream& operator<<(std::ostream& os, const ComponentContainer& container) {

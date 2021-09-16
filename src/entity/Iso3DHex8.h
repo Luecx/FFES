@@ -31,7 +31,7 @@ struct Iso3DHex8 : public Element{
               int node_8);
 
     DenseMatrix computeLocalStiffness() override;
-
+    DenseMatrix extrapolate(DenseMatrix& integration_point_results) override;
     int         nodeDOF() override;
     int         nodeCount() override;
     int*        nodeIDS() override;

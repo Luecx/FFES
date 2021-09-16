@@ -29,6 +29,7 @@ struct Iso2DQuad4 : public Element {
     Iso2DQuad4(int node_1, int node_2, int node_3, int node_4);
 
     DenseMatrix computeLocalStiffness() override;
+    DenseMatrix extrapolate(DenseMatrix& integration_point_results) override;
 
     int         nodeDOF() override;
     int         nodeCount() override;

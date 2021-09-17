@@ -16,8 +16,9 @@
  *                                                                                                  *
  ****************************************************************************************************/
 #include "Model.h"
+#include "../system/LoadCase.h"
 
-void Model::postProcessDisplacements(const Eigen::VectorXd& displacement) {
+void Model::postProcessDisplacements(const Eigen::VectorXd& displacement, LoadCase* load_case) {
     for(int i = 0; i < max_node_count; i++){
 
         // dont create a load vector for unused nodes
@@ -31,7 +32,7 @@ void Model::postProcessDisplacements(const Eigen::VectorXd& displacement) {
 
             // check if its constrained
             if(dof_id < 0){
-                node_data[DISPLACEMENT][i][d] = node_data[BOUNDARY_DISPLACEMENT][i][d];
+                node_data[DISPLACEMENT][i][d] = load_case->node_data[BOUNDARY_DISPLACEMENT][i][d];
             }else{
                 node_data[DISPLACEMENT][i][d] = displacement(dof_id);
             }

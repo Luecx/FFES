@@ -16,9 +16,6 @@
  *                                                                                                  *
  ****************************************************************************************************/
 
-#ifndef FEM_SRC_MODEL_LOADMANAGMENT_CPP_
-#define FEM_SRC_MODEL_LOADMANAGMENT_CPP_
-
 #include "LoadCase.h"
 
 #include <cmath>
@@ -72,5 +69,3 @@ void LoadCase::applyLoad(int node_id,
         }
     }
 }
-
-#endif    // FEM_SRC_MODEL_LOADMANAGMENT_CPP_

@@ -56,6 +56,7 @@ struct Model {
 
         node_data[USED                               ].init(max_node_count * 1, max_node_count).even(1);
         node_data[POSITION                           ].init(max_node_count * 3, max_node_count).even(3);
+        node_data[DISPLACEMENT                       ].init(max_node_count * 3, max_node_count).even(3);
         node_data[BOUNDARY_IMPLIED_DISPLACEMENT_FORCE].init(max_node_count * 3, max_node_count).even(3);
         node_data[STRESS                             ].init(max_node_count * 6, max_node_count).even(6);
 
@@ -98,6 +99,8 @@ struct Model {
             node_data[USED][static_cast<Element*>(el)->nodeIDS()[i]] = 1;
         }
     }
+    void addNodeToNodeSet(const std::string& name, ID node_id);
+    void addElementToElementSet(const std::string& name, ID element_id);
 
     // functions to manage materials
     ID addMaterial(const std::string& name);
@@ -119,7 +122,7 @@ struct Model {
     Eigen::VectorXd buildReducedLoadVector(LoadCase* load_case);
 
     // compute displacements for every node
-    void postProcessDisplacements(const Eigen::VectorXd& displacement);
+    void postProcessDisplacements(const Eigen::VectorXd& displacement, LoadCase* load_case);
 
     // numerate unconstrained vertices
     ID numerateUnconstrainedNodes(LoadCase* load_case);

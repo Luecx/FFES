@@ -78,8 +78,10 @@ class Reader {
         std::string nset_name = this->line_data.requireValue("NSET");
         sys->model.activateNodeSet(nset_name);
         nextLine();
-        while (line_data.line_type == NORMAL) {
-
+        while (line_data.line_type != END_OF_FILE && line_data.line_type != HEADER) {
+            
+	    if(line_data.line_type == COMMENT) continue;
+	    
             auto id = std::stoi(line_data.csv[0]) - 1;
 
             auto x  = std::stof(line_data.csv[1]);
@@ -91,6 +93,23 @@ class Reader {
             nextLine();
         }
     }
+    void read_NSET() {
+        auto        sys       = getSystem();
+        std::string nset_name = this->line_data.requireValue("NSET");
+	sys->model.activateNodeSet(nset_name);
+        nextLine();
+	while (line_data.line_type != END_OF_FILE && line_data.line_type != HEADER) {
+
+	    if(line_data.line_type == COMMENT) continue;
+	    	    
+	    for(int h = 0; h < line_data.csv_count; h++){
+		if(!line_data.csv[h].empty())
+	            sys->model.addNodeToNodeSet(nset_name, std::stoi(line_data.csv[h]));
+	    }
+	    
+	    nextLine();
+	}
+    }
     void read_ELEMENT() {
         auto        sys        = getSystem();
         std::string elset_name = this->line_data.requireValue("ELSET");
@@ -98,7 +117,9 @@ class Reader {
         sys->model.activateElementSet(elset_name);
         nextLine();
 
-        while (line_data.line_type == NORMAL) {
+        while (line_data.line_type != END_OF_FILE && line_data.line_type != HEADER) {
+
+	    if(line_data.line_type == COMMENT) continue;
 
             auto id = std::stoi(line_data.csv[0]) - 1;
 
@@ -110,7 +131,8 @@ class Reader {
                 auto n5 = std::stoi(line_data.csv[5]) - 1;
                 auto n6 = std::stoi(line_data.csv[6]) - 1;
                 auto n7 = std::stoi(line_data.csv[7]) - 1;
-                auto n8 = std::stoi(line_data.csv[8]) - 1;
+//		nextLine();
+                auto n8 = std::stoi(line_data.csv[0]) - 1;
                 sys->model.setElement<Iso3DHex8>(id, n1, n2, n3, n4, n5, n6, n7, n8);
             } else {
                 ERROR(false, PARSING_SYNTAX_ERROR, "element type not known: " << type);
@@ -174,9 +196,9 @@ class Reader {
         nextLine();
     }
     void read_BOUNDARY(){
+        bool is_temporary = line_data.parseValue("OP", "") == "TEMPORARY";
         nextLine();
-        bool is_temporary = line_data.requireValue("OP") == "TEMPORARY";
-        while(line_data.line_type != END_OF_FILE || line_data.line_type == HEADER){
+        while(line_data.line_type != END_OF_FILE && line_data.line_type != HEADER){
             if(line_data.line_type == COMMENT) continue;
             if(line_data.csv_count < 3) continue;
             auto dim = std::stoi(line_data.csv[1]);
@@ -186,12 +208,13 @@ class Reader {
             }else{
                 system->getLoadCase()->constraint(std::stoi(line_data.csv[0]), dim, dis, is_temporary);
             }
+            nextLine();
         }
     }
     void read_CLOAD(){
+        bool is_temporary = line_data.parseValue("OP", "") == "TEMPORARY";
         nextLine();
-        bool is_temporary = line_data.requireValue("OP") == "TEMPORARY";
-        while(line_data.line_type != END_OF_FILE || line_data.line_type == HEADER){
+        while(line_data.line_type != END_OF_FILE && line_data.line_type != HEADER){
             if(line_data.line_type == COMMENT) continue;
             if(line_data.csv_count < 3) continue;
             auto dim = std::stoi(line_data.csv[1]);
@@ -201,6 +224,7 @@ class Reader {
             }else{
                 system->getLoadCase()->applyLoad(std::stoi(line_data.csv[0]), dim, dis, is_temporary);
             }
+            nextLine();
         }
     }
 
@@ -264,6 +288,7 @@ class Reader {
         openFile();
 
         while (line_data.line_type != END_OF_FILE) {
+	    std::cout << line_data.line << std::endl;
             if (line_data.line_type == COMMENT)
                 nextLine();
             else if (line_data.line_type == EMPTY)
@@ -274,7 +299,9 @@ class Reader {
                 std::string header_name = line_data.commandName();
                 if (header_name == "NODE") {
                     read_NODE();
-                } else if (header_name == "ELEMENT") {
+                } else if(header_name == "NSET") {
+		    read_NSET();
+		} else if (header_name == "ELEMENT") {
                     read_ELEMENT();
                 } else if (header_name == "INCLUDE") {
                     read_INCLUDE();
@@ -294,6 +321,7 @@ class Reader {
                 }
             }
         }
+	std::cout << "EOF" << std::endl;
         closeFile();
         return system;
     }

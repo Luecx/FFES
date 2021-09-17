@@ -181,10 +181,25 @@ class Reader {
             if(line_data.csv_count < 3) continue;
             auto dim = std::stoi(line_data.csv[1]);
             auto dis = std::stof(line_data.csv[2]);
-            if(system->model.getElementSetID(line_data.csv[0]) >= 0){
+            if(system->model.getNodeSetID(line_data.csv[0]) >= 0){
                 system->getLoadCase()->constraint(line_data.csv[0], dim, dis, is_temporary);
             }else{
                 system->getLoadCase()->constraint(std::stoi(line_data.csv[0]), dim, dis, is_temporary);
+            }
+        }
+    }
+    void read_CLOAD(){
+        nextLine();
+        bool is_temporary = line_data.requireValue("OP") == "TEMPORARY";
+        while(line_data.line_type != END_OF_FILE || line_data.line_type == HEADER){
+            if(line_data.line_type == COMMENT) continue;
+            if(line_data.csv_count < 3) continue;
+            auto dim = std::stoi(line_data.csv[1]);
+            auto dis = std::stof(line_data.csv[2]);
+            if(system->model.getNodeSetID(line_data.csv[0]) >= 0){
+                system->getLoadCase()->applyLoad(line_data.csv[0], dim, dis, is_temporary);
+            }else{
+                system->getLoadCase()->applyLoad(std::stoi(line_data.csv[0]), dim, dis, is_temporary);
             }
         }
     }
@@ -271,6 +286,8 @@ class Reader {
                     read_LOADCASE();
                 } else if (header_name == "BOUNDARY") {
                     read_BOUNDARY();
+                } else if (header_name == "CLOAD") {
+                    read_CLOAD();
                 } else {
                     nextLine();
                     WARNING(false, "Command not known: " << header_name);

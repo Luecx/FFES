@@ -41,24 +41,12 @@ int stopMeasure() {
     // std::cout << "measurement finished! [" << round(diff.count() * 1000) << "
     // ms]" << std::endl;
 }
-int main() {
+int main(int argc, char* argv[]) {
 
 
-    Reader reader{"../bin/test.inp"};
+    Reader reader{argv[1]};
     auto system = reader.read();
-
-//    system->model.constraint(0,0,0,0);
-//    system->model.constraint(1,0,0,0);
-//    system->model.constraint(2,0,0,0);
-//    system->model.constraint(3,0,0,0);
-//    system->model.applyLoad(4,10,10,10);
-//
-//    auto k = system->model.buildReducedStiffnessMatrix();
-//    auto f = system->model.buildReducedLoadVector();
-//    auto solution = conjugate_gradient(k, f);
-//    system->model.postProcessDisplacements(solution);
-//    std::cout << system->model.node_data[DISPLACEMENT] << std::endl;
-
+    system->getLoadCase()->compute();
     delete system;
 
 

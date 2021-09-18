@@ -16,38 +16,36 @@
  *                                                                                                  *
  ****************************************************************************************************/
 
-#ifndef FEM_SRC_SYSTEM_SYSTEM_H_
-#define FEM_SRC_SYSTEM_SYSTEM_H_
+#ifndef FEM_SRC_CORE_ELEMENTDATA_H_
+#define FEM_SRC_CORE_ELEMENTDATA_H_
 
-#include "LoadCase.h"
+#include "ComponentContainer.h"
+#include "defs.h"
 
-#include <vector>
+#include <ostream>
 
-struct System {
+enum ElementDataEntries{
+    SIMP_DENSITY_FACTOR,
+    SIMP_DENSITY_EXPONENT,
+    N_MAX_ELEMENT_FLOAT_ENTRIES
+};
 
-    public:
-    Model model;
-    std::vector<LoadCase*> load_cases {};
+enum ElementDataIntegerEntries{
+    N_MAX_ELEMENT_INT_ENTRIES
+};
 
+struct ElementData{
+    ComponentContainer<Precision> float_data[N_MAX_ELEMENT_FLOAT_ENTRIES]{};
+    ComponentContainer<int>       int_data  [N_MAX_ELEMENT_INT_ENTRIES]{};
 
-    public:
-    System(int max_nodes, int max_elements) : model(max_nodes, max_elements){
-        // add base load case
-        addLoadCase<LoadCase>();
+    ComponentContainer<Precision>& operator[](ElementDataEntries entry){
+        return float_data[entry];
     }
 
-    template<typename C>
-    C* addLoadCase(){
-        C* lc = new C(&model, getLoadCase());
-        load_cases.push_back(static_cast<LoadCase*> (lc));
-        return lc;
-    }
-
-    LoadCase* getLoadCase(){
-        if(load_cases.size() == 0) return nullptr;
-        return load_cases.back();
+    ComponentContainer<int>&       operator[](ElementDataIntegerEntries entry){
+        return int_data[entry];
     }
 
 };
 
-#endif    // FEM_SRC_SYSTEM_SYSTEM_H_
+#endif    // FEM_SRC_CORE_NODEDATA_H_

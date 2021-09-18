@@ -50,7 +50,7 @@ DenseMatrix Iso2DQuad4::computeLocalStiffness() {
     Precision         y4                 = (*node_data)[POSITION][node4][1];
 
     for (int i = 0; i < integration_points.getM(); i++) {
-        Precision        r = integration_points(i, 0);
+        Precision r = integration_points(i, 0);
         Precision s = integration_points(i,1);
 
         // containing derivatives of the shape functions h1 -> h4 with respect to r/s

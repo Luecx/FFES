@@ -131,8 +131,7 @@ class Reader {
                 auto n5 = std::stoi(line_data.csv[5]) - 1;
                 auto n6 = std::stoi(line_data.csv[6]) - 1;
                 auto n7 = std::stoi(line_data.csv[7]) - 1;
-//		nextLine();
-                auto n8 = std::stoi(line_data.csv[0]) - 1;
+                auto n8 = std::stoi(line_data.csv[8]) - 1;
                 sys->model.setElement<Iso3DHex8>(id, n1, n2, n3, n4, n5, n6, n7, n8);
             } else {
                 ERROR(false, PARSING_SYNTAX_ERROR, "element type not known: " << type);

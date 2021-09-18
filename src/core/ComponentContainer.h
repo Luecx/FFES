@@ -57,10 +57,19 @@ template<typename C> struct ComponentContainer {
         return *this;
     }
 
-    void even(int spacing){
+    ComponentContainer& even(int spacing=0){
+        if(spacing == 0) spacing = this->data_count / this->index_count;
         for(int i = 0; i < index_count; i++){
-            setIndexIncremental(i, spacing);
+            setSizeIncremental(i, spacing);
         }
+        return *this;
+    }
+
+    ComponentContainer& fill(C value){
+        for(int i = 0; i < data_count; i++){
+            data[i] = value;
+        }
+        return *this;
     }
 
     void cleanUp() {
@@ -115,7 +124,7 @@ template<typename C> struct ComponentContainer {
         return os;
     }
 
-    void setIndexIncremental(int id, int size){
+    void setSizeIncremental(int id, int size){
         if(id + 1 >= index_count) return;
         this->indices[id+1] = this->indices[id] + size;
     }

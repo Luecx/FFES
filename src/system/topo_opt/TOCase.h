@@ -16,38 +16,28 @@
  *                                                                                                  *
  ****************************************************************************************************/
 
-#ifndef FEM_SRC_SYSTEM_SYSTEM_H_
-#define FEM_SRC_SYSTEM_SYSTEM_H_
+#ifndef FEM_SRC_SYSTEM_TOPO_OPT_TOCASE_H_
+#define FEM_SRC_SYSTEM_TOPO_OPT_TOCASE_H_
 
-#include "LoadCase.h"
+#include "../LoadCase.h"
 
-#include <vector>
+struct TOCase : public LoadCase{
 
-struct System {
-
-    public:
-    Model model;
-    std::vector<LoadCase*> load_cases {};
-
-
-    public:
-    System(int max_nodes, int max_elements) : model(max_nodes, max_elements){
-        // add base load case
-        addLoadCase<LoadCase>();
+    TOCase(Model* p_model, LoadCase* p_previous, int iterations, Precision min_res) : LoadCase(p_model, p_previous) {
+        this->element_data[SIMP_DENSITY_FACTOR]
+            .init(model->max_element_count, model->max_element_count)
+            .even()
+            .fill(1);
+        this->element_data[SIMP_DENSITY_EXPONENT]
+            .init(model->max_element_count, model->max_element_count)
+            .even()
+            .fill(3);
     }
 
-    template<typename C>
-    C* addLoadCase(){
-        C* lc = new C(&model, getLoadCase());
-        load_cases.push_back(static_cast<LoadCase*> (lc));
-        return lc;
+    virtual ~TOCase() {
+        this->element_data[SIMP_DENSITY_EXPONENT].cleanUp();
+        this->element_data[SIMP_DENSITY_FACTOR  ].cleanUp();
     }
-
-    LoadCase* getLoadCase(){
-        if(load_cases.size() == 0) return nullptr;
-        return load_cases.back();
-    }
-
 };
 
-#endif    // FEM_SRC_SYSTEM_SYSTEM_H_
+#endif    // FEM_SRC_SYSTEM_TOPO_OPT_TOCASE_H_

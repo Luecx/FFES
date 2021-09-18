@@ -21,12 +21,14 @@
 
 #include "../assert/Assert.h"
 #include "../assert/Error.h"
+#include "../core/ElementData.h"
 #include "../core/NodeData.h"
 #include "../model/Model.h"
 #include "../solver/CG.h"
 
 struct LoadCase {
-    NodeData  node_data {};
+    NodeData     node_data {};
+    ElementData  element_data {};
     Model*    model;
     LoadCase* previous_load_case;
 
@@ -105,7 +107,7 @@ struct LoadCase {
 
     void reconstructBoundary();
 
-    void compute(){
+    virtual void compute(){
         model->numerateUnconstrainedNodes(this);
         auto matrix = model->buildReducedStiffnessMatrix(this);
         auto vector = model->buildReducedLoadVector(this);

@@ -99,6 +99,7 @@ struct Model {
             node_data[USED][static_cast<Element*>(el)->nodeIDS()[i]] = 1;
         }
     }
+
     void addNodeToNodeSet(const std::string& name, ID node_id);
     void addElementToElementSet(const std::string& name, ID element_id);
 

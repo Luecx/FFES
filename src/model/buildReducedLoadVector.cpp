@@ -34,6 +34,9 @@ Eigen::VectorXd Model::buildReducedLoadVector(LoadCase* load_case) {
         // dont create a load vector for unused nodes
         if(node_data[USED][i][0] == 0) continue;
 
+        // dont create a load vector for nodes not connected to any element
+        if(node_data[NODE_CONNECTED_ELEMENTS][i][0] == 0) continue;
+
         // go over each dimension
         for(int j = 0; j < nodal_dimension; j++){
 

@@ -79,9 +79,10 @@ class Reader {
         sys->model.activateNodeSet(nset_name);
         nextLine();
         while (line_data.line_type != END_OF_FILE && line_data.line_type != HEADER) {
-            
-	    if(line_data.line_type == COMMENT) continue;
-	    
+
+            if (line_data.line_type == COMMENT)
+                continue;
+
             auto id = std::stoi(line_data.csv[0]) - 1;
 
             auto x  = std::stof(line_data.csv[1]);
@@ -96,19 +97,20 @@ class Reader {
     void read_NSET() {
         auto        sys       = getSystem();
         std::string nset_name = this->line_data.requireValue("NSET");
-	sys->model.activateNodeSet(nset_name);
+        sys->model.activateNodeSet(nset_name);
         nextLine();
-	while (line_data.line_type != END_OF_FILE && line_data.line_type != HEADER) {
+        while (line_data.line_type != END_OF_FILE && line_data.line_type != HEADER) {
 
-	    if(line_data.line_type == COMMENT) continue;
-	    	    
-	    for(int h = 0; h < line_data.csv_count; h++){
-		if(!line_data.csv[h].empty())
-	            sys->model.addNodeToNodeSet(nset_name, std::stoi(line_data.csv[h]));
-	    }
-	    
-	    nextLine();
-	}
+            if (line_data.line_type == COMMENT)
+                continue;
+
+            for (int h = 0; h < line_data.csv_count; h++) {
+                if (!line_data.csv[h].empty())
+                    sys->model.addNodeToNodeSet(nset_name, std::stoi(line_data.csv[h]) - 1);
+            }
+
+            nextLine();
+        }
     }
     void read_ELEMENT() {
         auto        sys        = getSystem();
@@ -119,7 +121,8 @@ class Reader {
 
         while (line_data.line_type != END_OF_FILE && line_data.line_type != HEADER) {
 
-	    if(line_data.line_type == COMMENT) continue;
+            if (line_data.line_type == COMMENT)
+                continue;
 
             auto id = std::stoi(line_data.csv[0]) - 1;
 
@@ -151,7 +154,7 @@ class Reader {
         ID          id       = sys->model.addMaterial(mat_name);
         nextLine();
 
-        while(line_data.line_type != END_OF_FILE){
+        while (line_data.line_type != END_OF_FILE) {
             if (line_data.line_type == COMMENT) {
 
             } else if (line_data.line_type == EMPTY) {
@@ -163,26 +166,26 @@ class Reader {
                 if (header_name == "ELASTIC") {
                     std::string type = line_data.requireValue("TYPE");
                     nextLine();
-                    if(type == "ISOTROPIC"){
+                    if (type == "ISOTROPIC") {
                         Precision young   = std::stod(line_data.csv[0]);
                         Precision poisson = std::stod(line_data.csv[1]);
                         sys->model.materials[id]->setElasticity<IsotropicElasticity>(young, poisson);
-                    }else{
+                    } else {
                         ERROR(false, ELEMENT_TYPE_NOT_KNOWN, type);
                     }
                     nextLine();
                 } else if (header_name == "DENSITY") {
                     nextLine();
-                    Precision density   = std::stod(line_data.csv[0]);
+                    Precision density                 = std::stod(line_data.csv[0]);
                     sys->model.materials[id]->density = density;
-                } else{
+                } else {
                     break;
                 }
             }
             nextLine();
         }
     }
-    void read_SOLIDSECTION(){
+    void read_SOLIDSECTION() {
         nextLine();
 
         std::string element_set   = line_data.csv[0];
@@ -190,38 +193,44 @@ class Reader {
         getSystem()->model.solidSection(element_set, material_name);
         nextLine();
     }
-    void read_LOADCASE(){
-        system->addLoadCase();
+    void read_LOADCASE() {
+        getSystem()->addLoadCase<LoadCase>();
         nextLine();
     }
-    void read_BOUNDARY(){
+    void read_BOUNDARY() {
         bool is_temporary = line_data.parseValue("OP", "") == "TEMPORARY";
         nextLine();
-        while(line_data.line_type != END_OF_FILE && line_data.line_type != HEADER){
-            if(line_data.line_type == COMMENT) continue;
-            if(line_data.csv_count < 3) continue;
-            auto dim = std::stoi(line_data.csv[1]);
+        while (line_data.line_type != END_OF_FILE && line_data.line_type != HEADER) {
+            if (line_data.line_type == COMMENT)
+                continue;
+            if (line_data.csv_count < 3)
+                continue;
+            auto dim = std::stoi(line_data.csv[1]) - 1;
             auto dis = std::stof(line_data.csv[2]);
-            if(system->model.getNodeSetID(line_data.csv[0]) >= 0){
-                system->getLoadCase()->constraint(line_data.csv[0], dim, dis, is_temporary);
-            }else{
-                system->getLoadCase()->constraint(std::stoi(line_data.csv[0]), dim, dis, is_temporary);
+            if (getSystem()->model.getNodeSetID(line_data.csv[0]) >= 0) {
+                getSystem()->getLoadCase()->constraint(line_data.csv[0], dim, dis, is_temporary);
+            } else {
+                getSystem()->getLoadCase()->constraint(std::stoi(line_data.csv[0]) - 1, dim, dis,
+                                                       is_temporary);
             }
             nextLine();
         }
     }
-    void read_CLOAD(){
+    void read_CLOAD() {
         bool is_temporary = line_data.parseValue("OP", "") == "TEMPORARY";
         nextLine();
-        while(line_data.line_type != END_OF_FILE && line_data.line_type != HEADER){
-            if(line_data.line_type == COMMENT) continue;
-            if(line_data.csv_count < 3) continue;
-            auto dim = std::stoi(line_data.csv[1]);
+        while (line_data.line_type != END_OF_FILE && line_data.line_type != HEADER) {
+            if (line_data.line_type == COMMENT)
+                continue;
+            if (line_data.csv_count < 3)
+                continue;
+            auto dim = std::stoi(line_data.csv[1]) - 1;
             auto dis = std::stof(line_data.csv[2]);
-            if(system->model.getNodeSetID(line_data.csv[0]) >= 0){
-                system->getLoadCase()->applyLoad(line_data.csv[0], dim, dis, is_temporary);
-            }else{
-                system->getLoadCase()->applyLoad(std::stoi(line_data.csv[0]), dim, dis, is_temporary);
+            if (getSystem()->model.getNodeSetID(line_data.csv[0]) >= 0) {
+                getSystem()->getLoadCase()->applyLoad(line_data.csv[0], dim, dis, is_temporary);
+            } else {
+                getSystem()->getLoadCase()->applyLoad(std::stoi(line_data.csv[0]) - 1, dim, dis,
+                                                      is_temporary);
             }
             nextLine();
         }
@@ -287,7 +296,7 @@ class Reader {
         openFile();
 
         while (line_data.line_type != END_OF_FILE) {
-	    std::cout << line_data.line << std::endl;
+            std::cout << line_data.line << std::endl;
             if (line_data.line_type == COMMENT)
                 nextLine();
             else if (line_data.line_type == EMPTY)
@@ -298,9 +307,9 @@ class Reader {
                 std::string header_name = line_data.commandName();
                 if (header_name == "NODE") {
                     read_NODE();
-                } else if(header_name == "NSET") {
-		    read_NSET();
-		} else if (header_name == "ELEMENT") {
+                } else if (header_name == "NSET") {
+                    read_NSET();
+                } else if (header_name == "ELEMENT") {
                     read_ELEMENT();
                 } else if (header_name == "INCLUDE") {
                     read_INCLUDE();
@@ -320,7 +329,7 @@ class Reader {
                 }
             }
         }
-	std::cout << "EOF" << std::endl;
+        std::cout << "EOF" << std::endl;
         closeFile();
         return system;
     }

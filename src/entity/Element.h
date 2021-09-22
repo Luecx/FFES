@@ -23,6 +23,8 @@
 #include "../material/Material.h"
 #include "../matrix/DenseMatrix.h"
 
+struct LoadCase;
+
 struct Element {
 
     NodeData* node_data = nullptr;
@@ -31,7 +33,8 @@ struct Element {
     virtual ~Element() {}
 
     virtual DenseMatrix computeLocalStiffness() = 0;
-    virtual DenseMatrix extrapolate(DenseMatrix& integration_point_results) = 0;
+    virtual DenseMatrix computeStress(LoadCase* load_case, const DenseMatrix& evaluation_points) = 0;
+    virtual DenseMatrix getIntegrationScheme() = 0;
 
     virtual int  nodeDOF() = 0;
     virtual int  nodeCount() = 0;

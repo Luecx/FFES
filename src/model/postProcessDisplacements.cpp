@@ -19,10 +19,17 @@
 #include "../system/LoadCase.h"
 
 void Model::postProcessDisplacements(const Eigen::VectorXd& displacement, LoadCase* load_case) {
+
+    load_case->node_data[DISPLACEMENT].init(max_node_count * nodal_dimension, max_node_count)
+        .even(nodal_dimension);
+
     for(int i = 0; i < max_node_count; i++){
 
         // dont create a load vector for unused nodes
         if(node_data[USED][i][0] == 0) continue;
+
+        // dont numerate nodes not connected to any element
+        if(node_data[NODE_CONNECTED_ELEMENTS][i][0] == 0) continue;
 
         // iterate over each dimension
         for(int d = 0; d < nodal_dimension; d++){
@@ -32,9 +39,9 @@ void Model::postProcessDisplacements(const Eigen::VectorXd& displacement, LoadCa
 
             // check if its constrained
             if(dof_id < 0){
-                node_data[DISPLACEMENT][i][d] = load_case->node_data[BOUNDARY_DISPLACEMENT][i][d];
+                load_case->node_data[DISPLACEMENT][i][d] = load_case->node_data[BOUNDARY_DISPLACEMENT][i][d];
             }else{
-                node_data[DISPLACEMENT][i][d] = displacement(dof_id);
+                load_case->node_data[DISPLACEMENT][i][d] = displacement(dof_id);
             }
 
         }

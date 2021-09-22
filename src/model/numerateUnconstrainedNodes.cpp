@@ -25,6 +25,9 @@ ID Model::numerateUnconstrainedNodes(LoadCase* load_case) {
         .init(max_node_count * nodal_dimension, max_node_count)
         .even(nodal_dimension);
 
+    // inits the amount of connected elements for each element
+    this->updateNodeConnectedCount();
+
     // incrementally count IDS
     int ids = 0;
 
@@ -35,6 +38,9 @@ ID Model::numerateUnconstrainedNodes(LoadCase* load_case) {
     for(int i = 0; i < max_node_count; i++){
         // dont numerate if its not used
         if(node_data[USED][i][0] == 0) continue;
+
+        // dont numerate nodes not connected to any element
+        if(node_data[NODE_CONNECTED_ELEMENTS][i][0] == 0) continue;
 
         // go over each dimension of the node
         for(int j = 0; j < nodal_dimension; j++){

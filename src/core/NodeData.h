@@ -44,6 +44,7 @@ enum NodeDataEntries{
 
 enum NodeDataIntegerEntries{
     REDUCED_STIFFNESS_INDEX,
+    NODE_CONNECTED_ELEMENTS,
     N_MAX_NODE_INT_ENTRIES
 };
 

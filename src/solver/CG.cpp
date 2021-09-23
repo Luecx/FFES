@@ -1,34 +1,19 @@
-/****************************************************************************************************
- *                                                                                                  *
- *                                                FFES                                              *
- *                                          by. Finn Eggers                                         *
- *                                                                                                  *
- *                    FFESis free software: you can redistribute it and/or modify                   *
- *                it under the terms of the GNU General Public License as published by              *
- *                 the Free Software Foundation, either version 3 of the License, or                *
- *                                (at your option) any later version.                               *
- *                       FFESis distributed in the hope that it will be useful,                     *
- *                   but WITHOUT ANY WARRANTY; without even the implied warranty of                 *
- *                   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                  *
- *                            GNU General Public License for more details.                          *
- *                 You should have received a copy of the GNU General Public License                *
- *                   along with FFES.  If not, see <http://www.gnu.org/licenses/>.                  *
- *                                                                                                  *
- ****************************************************************************************************/
+
 
 #include "CG.h"
 
 #include <chrono>
-Eigen::VectorXd conjugate_gradient(const Eigen::SparseMatrix<Precision>& matrix, const Eigen::VectorXd& b) {
+Eigen::Matrix<Precision,Eigen::Dynamic,1> conjugate_gradient(const Eigen::SparseMatrix<Precision>& matrix,
+                                   const Eigen::Matrix<Precision,Eigen::Dynamic,1>& b) {
 
 
-    Eigen::VectorXd sol(b.size()), t(b.size());
+    Eigen::Matrix<Precision,Eigen::Dynamic,1> sol(b.size()), t(b.size());
     std::cout << "Attempting to solve matrix: " << b.size() << "x" << b.size() << std::endl;
 
     Eigen::ConjugateGradient<
-        Eigen::SparseMatrix<Precision>,
+        Eigen::SparseMatrix<float>,
         Eigen::Lower|Eigen::Upper ,
-        Eigen::IncompleteCholesky<Precision>> solver;
+        Eigen::IncompleteCholesky<float>> solver;
 
     solver.compute(matrix);
 

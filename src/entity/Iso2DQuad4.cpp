@@ -1,20 +1,4 @@
-/****************************************************************************************************
- *                                                                                                  *
- *                                                FFES                                              *
- *                                          by. Finn Eggers                                         *
- *                                                                                                  *
- *                    FFESis free software: you can redistribute it and/or modify                   *
- *                it under the terms of the GNU General Public License as published by              *
- *                 the Free Software Foundation, either version 3 of the License, or                *
- *                                (at your option) any later version.                               *
- *                       FFESis distributed in the hope that it will be useful,                     *
- *                   but WITHOUT ANY WARRANTY; without even the implied warranty of                 *
- *                   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                  *
- *                            GNU General Public License for more details.                          *
- *                 You should have received a copy of the GNU General Public License                *
- *                   along with FFES.  If not, see <http://www.gnu.org/licenses/>.                  *
- *                                                                                                  *
- ****************************************************************************************************/
+
 #include "Iso2DQuad4.h"
 
 #include "../assert/Error.h"
@@ -117,7 +101,6 @@ DenseMatrix Iso2DQuad4::computeLocalStiffness() {
     return DenseMatrix{stiffness};
 
 }
-
 DenseMatrix Iso2DQuad4::computeStress(LoadCase* load_case, const DenseMatrix& evaluation_points) {
     //TODO
     DenseMatrix stresses {3,4};

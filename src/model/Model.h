@@ -1,20 +1,4 @@
-/****************************************************************************************************
- *                                                                                                  *
- *                                                FFES                                              *
- *                                          by. Finn Eggers                                         *
- *                                                                                                  *
- *                    FFESis free software: you can redistribute it and/or modify                   *
- *                it under the terms of the GNU General Public License as published by              *
- *                 the Free Software Foundation, either version 3 of the License, or                *
- *                                (at your option) any later version.                               *
- *                       FFESis distributed in the hope that it will be useful,                     *
- *                   but WITHOUT ANY WARRANTY; without even the implied warranty of                 *
- *                   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                  *
- *                            GNU General Public License for more details.                          *
- *                 You should have received a copy of the GNU General Public License                *
- *                   along with FFES.  If not, see <http://www.gnu.org/licenses/>.                  *
- *                                                                                                  *
- ****************************************************************************************************/
+
 
 #ifndef FEM_SRC_ENTITY_MODEL_H_
 #define FEM_SRC_ENTITY_MODEL_H_
@@ -54,11 +38,8 @@ struct Model {
         : max_node_count   (p_node_count),
           max_element_count(p_element_count) {
 
-        node_data[USED                               ].init(max_node_count * 1, max_node_count).even(1);
         node_data[POSITION                           ].init(max_node_count * 3, max_node_count).even(3);
-        node_data[DISPLACEMENT                       ].init(max_node_count * 3, max_node_count).even(3);
         node_data[BOUNDARY_IMPLIED_DISPLACEMENT_FORCE].init(max_node_count * 3, max_node_count).even(3);
-        node_data[STRESS                             ].init(max_node_count * 6, max_node_count).even(6);
 
         elements.resize(max_element_count);
         for(int i = 0; i < max_element_count; i++) elements[i] = nullptr;
@@ -94,10 +75,6 @@ struct Model {
 
         this->element_sets[0                 ].ids.push_back(id);
         this->element_sets[active_element_set].ids.push_back(id);
-
-        for(int i = 0; i < static_cast<Element*>(el)->nodeCount(); i++){
-            node_data[USED][static_cast<Element*>(el)->nodeIDS()[i]] = 1;
-        }
     }
 
     void addNodeToNodeSet(const std::string& name, ID node_id);
@@ -120,10 +97,10 @@ struct Model {
     Eigen::SparseMatrix<Precision> buildReducedStiffnessMatrix(LoadCase* load_case);
 
     // build load vector
-    Eigen::VectorXd buildReducedLoadVector(LoadCase* load_case);
+    Eigen::Matrix<Precision,Eigen::Dynamic,1> buildReducedLoadVector(LoadCase* load_case);
 
     // compute displacements for every node
-    void postProcessDisplacements(const Eigen::VectorXd& displacement, LoadCase* load_case);
+    void postProcessDisplacements(const Eigen::Matrix<Precision,Eigen::Dynamic,1>& displacement, LoadCase* load_case);
 
     // numerate unconstrained vertices
     ID numerateUnconstrainedNodes(LoadCase* load_case);

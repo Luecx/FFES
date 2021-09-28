@@ -1,20 +1,11 @@
 #include "src/core/NodeData.h"
 #include "src/entity/Iso2DQuad4.h"
-#include "src/entity/Iso2DTri3.h"
 #include "src/entity/Iso3DHex8.h"
-#include "src/integration/Quadrature.h"
 #include "src/material/IsotropicElasticity.h"
-#include "src/matrix/DenseMatrix.h"
-#include "src/matrix/Inverse.h"
-#include "src/matrix/Matrix.h"
-#include "src/matrix/QuickMatrix.h"
 #include "src/model/Model.h"
 #include "src/reader/Reader.h"
-#include "src/solver/CG.h"
-#include "src/integration/extrapolate.h"
-#include "src/system/System.h"
+#include "src/entity/IsoElement.h"
 
-#include <chrono>
 #include <iostream>
 
 int main(int argc, char* argv[]) {
@@ -25,6 +16,27 @@ int main(int argc, char* argv[]) {
     system->getLoadCase()->compute();
 
 
+    std::ofstream myfile;
+    myfile.open (argv[2]);
+
+    int element_id = 1;
+    for(auto el:system->model.elements){
+        if(el == nullptr) continue;
+
+        auto comp   = el->compliance(system->getLoadCase());
+
+        myfile << element_id ++ << ",";
+        myfile << comp;
+        myfile << "\n";
+    }
+
+    delete system;
+    myfile.close();
+
+//
+//    QuickMatrix<3,3> matrix;
+//    matrix.reshape<9,1>();
+//
 //    std::ofstream myfile;
 //    myfile.open (argv[2]);
 //

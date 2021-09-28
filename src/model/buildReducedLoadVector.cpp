@@ -7,9 +7,9 @@ Eigen::Matrix<Precision,Eigen::Dynamic,1> Model::buildReducedLoadVector(LoadCase
 
     Eigen::Matrix<Precision,Eigen::Dynamic,1>  nodal_forces {max_id, 1};
 
-    ASSERT(load_case->node_data[BOUNDARY_FORCE                     ].isInitialised());
-    ASSERT(           node_data[REDUCED_STIFFNESS_INDEX            ].isInitialised());
-    ASSERT(           node_data[BOUNDARY_IMPLIED_DISPLACEMENT_FORCE].isInitialised());
+    ERROR(load_case->node_data[BOUNDARY_FORCE                     ].isInitialised(), UNINITIALISED, "data is not initialised");
+    ERROR(           node_data[REDUCED_STIFFNESS_INDEX            ].isInitialised(), UNINITIALISED, "data is not initialised");
+    ERROR(           node_data[BOUNDARY_IMPLIED_DISPLACEMENT_FORCE].isInitialised(), UNINITIALISED, "data is not initialised");
 
     // first apply nodal forces
     for(int i = 0; i < max_node_count; i++){

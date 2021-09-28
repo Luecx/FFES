@@ -8,9 +8,9 @@
 
 template<int M, int N=1>
 class QuickMatrix : public Matrix{
-protected:
+    public:
     Precision data[M][N]{};
-public:
+
 QuickMatrix() : Matrix(M,N) {}
 QuickMatrix(const QuickMatrix<M,N>& other) : Matrix(M,N) {
         std::memcpy(data, other.data, sizeof(data));
@@ -50,13 +50,38 @@ QuickMatrix(const QuickMatrix<M,N>& other) : Matrix(M,N) {
         }
     }
 
+    Precision dot(const QuickMatrix<M,N>& other) const{
+        ASSERT(m == other.m);
+        ASSERT(n == other.n);
+        Precision res = 0;
+        for(int i = 0; i < m * n; i++){
+            res += data[i] * other.data[i];
+        }
+        return res;
+    }
+    QuickMatrix<M,N> hadamard(const QuickMatrix<M,N>& other) const{
+        ASSERT(m == other.m);
+        ASSERT(n == other.n);
+        QuickMatrix<M,N> res{*this};
+        for(int i = 0; i < m * n; i++){
+            res.data[i] = data[i] * other.data[i];
+        }
+        return res;
+    }
+
+    template<int M_NEW, int N_NEW>
+    inline QuickMatrix<M_NEW, N_NEW> reshape(){
+        QuickMatrix<M_NEW, N_NEW> res{};
+        std::memcpy(res.data, data, sizeof(data));
+        return res;
+    }
+
     QuickMatrix<M,N>& operator=(const QuickMatrix<M,N>& other){
         std::memcpy(data, other.data, sizeof(data));
         return *this;
     }
     QuickMatrix<M,N>& operator=(QuickMatrix<M,N>&& other){
-        this->data = other.data;
-        other.data = nullptr;
+        std::memcpy(data, other.data, sizeof(data));
         return *this;
     }
     QuickMatrix<M,N>& operator=(const Precision s){

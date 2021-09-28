@@ -41,10 +41,10 @@ add_executable(FEM
         src/material/Elasticity.h
         src/material/IsotropicElasticity.h      src/material/IsotropicElasticity.cpp
         src/integration/Quadrature.h
-        src/solver/CG.h                         src/solver/CG.cpp src/system/topo_opt/TOCase.h)
+        src/solver/CG.h                         src/solver/CG.cpp src/system/topo_opt/TOCase.h src/system/manageSimp.cpp src/entity/Element.cpp src/entity/IsoElement.cpp src/entity/IsoElement.h src/entity/IsoElementImplementation.h)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wshadow")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wshadow -Wno-unused-parameter")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flto")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")

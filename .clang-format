@@ -18,9 +18,10 @@ AllowShortCaseLabelsOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLambdasOnASingleLine: All
 AllowShortLoopsOnASingleLine: false
+AlwaysBreakTemplateDeclarations: Yes
 
-BinPackArguments: true
-BinPackParameters: true
+BinPackArguments: false
+BinPackParameters: false
 BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeBraces: Attach
 BreakBeforeTernaryOperators: true
@@ -42,7 +43,7 @@ NamespaceIndentation: Inner
 
 PointerAlignment: Left
 
-SortIncludes: true
+SortIncludes: CaseSensitive
 SortUsingDeclarations: true
 
 SpaceAfterCStyleCast: true

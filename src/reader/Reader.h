@@ -3,6 +3,7 @@
 #ifndef FEM_SRC_READER_READER_H_
 #define FEM_SRC_READER_READER_H_
 
+#include "../entity/Iso2DTri3.h"
 #include "../system/System.h"
 #include "LineData.h"
 #include "LineType.h"
@@ -120,7 +121,19 @@ class Reader {
                 auto n7 = std::stoi(line_data.csv[7]) - 1;
                 auto n8 = std::stoi(line_data.csv[8]) - 1;
                 sys->model.setElement<Iso3DHex8>(id, n1, n2, n3, n4, n5, n6, n7, n8);
-            } else {
+            } else if (type == "C2D3"){
+                auto n1 = std::stoi(line_data.csv[1]) - 1;
+                auto n2 = std::stoi(line_data.csv[2]) - 1;
+                auto n3 = std::stoi(line_data.csv[3]) - 1;
+                sys->model.setElement<Iso2DTri3>(id, n1, n2, n3);
+            } else if(type == "C2D4"){
+                auto n1 = std::stoi(line_data.csv[1]) - 1;
+                auto n2 = std::stoi(line_data.csv[2]) - 1;
+                auto n3 = std::stoi(line_data.csv[3]) - 1;
+                auto n4 = std::stoi(line_data.csv[4]) - 1;
+                sys->model.setElement<Iso2DQuad4>(id, n1, n2, n3, n4);
+            }else{
+
                 ERROR(false, PARSING_SYNTAX_ERROR, "element type not known: " << type);
             }
             nextLine();
@@ -185,10 +198,14 @@ class Reader {
         bool is_temporary = line_data.parseValue("OP", "") == "TEMPORARY";
         nextLine();
         while (line_data.line_type != END_OF_FILE && line_data.line_type != HEADER) {
-            if (line_data.line_type == COMMENT)
+            if (line_data.line_type == COMMENT){
+                nextLine();
                 continue;
-            if (line_data.csv_count < 3)
+            }
+            if (line_data.csv_count < 3){
+                nextLine();
                 continue;
+            }
             auto dim = std::stoi(line_data.csv[1]) - 1;
             auto dis = std::stof(line_data.csv[2]);
             if (getSystem()->model.getNodeSetID(line_data.csv[0]) >= 0) {
@@ -204,17 +221,44 @@ class Reader {
         bool is_temporary = line_data.parseValue("OP", "") == "TEMPORARY";
         nextLine();
         while (line_data.line_type != END_OF_FILE && line_data.line_type != HEADER) {
-            if (line_data.line_type == COMMENT)
+            if (line_data.line_type == COMMENT){
+                nextLine();
                 continue;
-            if (line_data.csv_count < 3)
+            }
+            if (line_data.csv_count < 3){
+                nextLine();
                 continue;
+            }
             auto dim = std::stoi(line_data.csv[1]) - 1;
             auto dis = std::stof(line_data.csv[2]);
             if (getSystem()->model.getNodeSetID(line_data.csv[0]) >= 0) {
                 getSystem()->getLoadCase()->applyLoad(line_data.csv[0], dim, dis, is_temporary);
             } else {
-                getSystem()->getLoadCase()->applyLoad(std::stoi(line_data.csv[0]) - 1, dim, dis,
+                getSystem()->getLoadCase()->applyLoad(std::stoi(line_data.csv[0]) - 1,
+                                                      dim,
+                                                      dis,
                                                       is_temporary);
+            }
+            nextLine();
+        }
+    }
+    void read_SIMP() {
+        bool is_temporary = line_data.parseValue("OP", "") == "TEMPORARY";
+        nextLine();
+        while (line_data.line_type != END_OF_FILE && line_data.line_type != HEADER) {
+            if (line_data.line_type == COMMENT)
+                continue;
+            if (line_data.csv_count < 3)
+                continue;
+            auto rho = std::stof(line_data.csv[1]);
+            auto exp = std::stof(line_data.csv[2]);
+            if (getSystem()->model.getElementSetID(line_data.csv[0]) >= 0) {
+                getSystem()->getLoadCase()->simp(line_data.csv[0], rho, exp, is_temporary);
+            } else {
+                getSystem()->getLoadCase()->simp(std::stoi(line_data.csv[0]) - 1,
+                                                 rho,
+                                                 exp,
+                                                 is_temporary);
             }
             nextLine();
         }
@@ -229,7 +273,6 @@ class Reader {
         bool reading_elements = false;
 
         while (line_data.line_type != END_OF_FILE) {
-
             if (line_data.line_type == COMMENT) {
 
             } else if (line_data.line_type == EMPTY) {
@@ -307,7 +350,9 @@ class Reader {
                     read_BOUNDARY();
                 } else if (header_name == "CLOAD") {
                     read_CLOAD();
-                } else {
+                } else if (header_name == "SIMP") {
+                    read_SIMP();
+                }else {
                     nextLine();
                     WARNING(false, "Command not known: " << header_name);
                 }

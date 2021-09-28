@@ -11,9 +11,9 @@ Eigen::Matrix<Precision,Eigen::Dynamic,1> conjugate_gradient(const Eigen::Sparse
     std::cout << "Attempting to solve matrix: " << b.size() << "x" << b.size() << std::endl;
 
     Eigen::ConjugateGradient<
-        Eigen::SparseMatrix<float>,
+        Eigen::SparseMatrix<Precision>,
         Eigen::Lower|Eigen::Upper ,
-        Eigen::IncompleteCholesky<float>> solver;
+        Eigen::IncompleteCholesky<Precision>> solver;
 
     solver.compute(matrix);
 

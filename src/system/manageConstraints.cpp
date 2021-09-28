@@ -62,21 +62,28 @@ void LoadCase::constraint(int node_id,
                 int dimension,
                 Precision value,
                 bool isTemp){
+
+    if(!node_data[BOUNDARY_IS_CONSTRAINED].isInitialised()){
+        node_data[BOUNDARY_IS_CONSTRAINED]
+            .init(model->max_node_count * 3, model->max_node_count)
+            .even(3);
+    }
+
+    if(!node_data[BOUNDARY_DISPLACEMENT].isInitialised()){
+        node_data[BOUNDARY_DISPLACEMENT]
+            .init(model->max_node_count * 3, model->max_node_count)
+            .even(3);
+    }
+
     if(!std::isnan(value)){
-        node_data[BOUNDARY_IS_CONSTRAINED][node_id][dimension] = 1;
-        node_data[BOUNDARY_DISPLACEMENT  ][node_id][dimension] = value;
 
-        if(!isTemp){
-            node_data[BOUNDARY_IS_CONSTRAINED_NEXT_CASE][node_id][dimension] = 1;
-            node_data[BOUNDARY_DISPLACEMENT_NEXT_CASE  ][node_id][dimension] = value;
-        }
+        node_data[BOUNDARY_IS_CONSTRAINED].set(node_id, dimension, 1    , !isTemp);
+        node_data[BOUNDARY_DISPLACEMENT  ].set(node_id, dimension, value, !isTemp);
+
     }else{
-        node_data[BOUNDARY_IS_CONSTRAINED][node_id][dimension] = 0;
-        node_data[BOUNDARY_DISPLACEMENT  ][node_id][dimension] = 0;
 
-        if(!isTemp){
-            node_data[BOUNDARY_IS_CONSTRAINED_NEXT_CASE][node_id][dimension] = 0;
-            node_data[BOUNDARY_DISPLACEMENT_NEXT_CASE  ][node_id][dimension] = 0;
-        }
+        node_data[BOUNDARY_IS_CONSTRAINED].set(node_id, dimension, 0    , !isTemp);
+        node_data[BOUNDARY_DISPLACEMENT  ].set(node_id, dimension, 0    , !isTemp);
+
     }
 }

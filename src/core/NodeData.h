@@ -29,11 +29,8 @@ enum NodeDataEntries{
     POSITION,                               // coordinates
 
     // LOAD CASE DATA
-    BOUNDARY_IS_CONSTRAINED_NEXT_CASE,      // contains information about the bc for the next case
     BOUNDARY_IS_CONSTRAINED,                // 1 if boundary displacement is constrained (see below)
-    BOUNDARY_DISPLACEMENT_NEXT_CASE,        // contains information about the bc for the next case
     BOUNDARY_DISPLACEMENT,                  // boundary displacement, relevant if BOUNDARY_IS_CONSTRAINED = 1
-    BOUNDARY_FORCE_NEXT_CASE,               // contains information about the bc for the next case
     BOUNDARY_FORCE,                         // boundary force, not relevant if constrained
 
     BOUNDARY_IMPLIED_DISPLACEMENT_FORCE,    // force implied due to displacements

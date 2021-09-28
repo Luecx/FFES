@@ -17,6 +17,7 @@ enum ErrorCodes {
     CANNOT_OPEN_FILE,
     ELEMENT_TYPE_NOT_KNOWN,
     NOT_YET_SUPPORTED,
+    UNINITIALISED,
 };
 
 #define ERROR(expr, code, value)                                                                 \

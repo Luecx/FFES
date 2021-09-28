@@ -72,6 +72,7 @@ struct Model {
 
         this->elements[id] = el;
         this->elements[id]->node_data = &node_data;
+        this->elements[id]->element_id = id;
 
         this->element_sets[0                 ].ids.push_back(id);
         this->element_sets[active_element_set].ids.push_back(id);

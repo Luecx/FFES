@@ -15,7 +15,7 @@ ID Model::numerateUnconstrainedNodes(LoadCase* load_case) {
     // incrementally count IDS
     int ids = 0;
 
-    ASSERT(load_case->node_data[BOUNDARY_IS_CONSTRAINED].isInitialised());
+    ERROR(load_case->node_data[BOUNDARY_IS_CONSTRAINED].isInitialised(), UNINITIALISED, "data is not initialised");
 
     // check each node and if its constrained, if so remove those indices
     for(int i = 0; i < max_node_count; i++){

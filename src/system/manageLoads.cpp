@@ -62,10 +62,14 @@ void LoadCase::applyLoad(int node_id,
                int dimension,
                Precision value,
                bool isTemp){
+
+    if(!node_data[BOUNDARY_FORCE].isInitialised()){
+        node_data[BOUNDARY_FORCE]
+            .init(model->max_node_count * 3, model->max_node_count)
+            .even(3);
+    }
+
     if(!std::isnan(value)){
-        node_data[BOUNDARY_FORCE][node_id][dimension] = value;
-        if(!isTemp){
-            node_data[BOUNDARY_FORCE_NEXT_CASE][node_id][dimension] = value;
-        }
+        node_data[BOUNDARY_FORCE].set(node_id, dimension, value, !isTemp);
     }
 }

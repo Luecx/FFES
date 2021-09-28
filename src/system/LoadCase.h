@@ -27,83 +27,33 @@
 #include "../solver/CG.h"
 
 struct LoadCase {
-    NodeData     node_data {};
-    ElementData  element_data {};
-    Model*    model;
-    LoadCase* previous_load_case;
+    NodeData    node_data {};
+    ElementData element_data {};
+    Model*      model;
+    LoadCase*   previous_load_case;
 
     LoadCase(Model* p_model, LoadCase* p_previous = nullptr)
         : model(p_model), previous_load_case(p_previous) {
-
-        //      BOUNDARY_IS_CONSTRAINED_NEXT_CASE,
-        //      BOUNDARY_IS_CONSTRAINED,
-        //      BOUNDARY_DISPLACEMENT_NEXT_CASE,
-        //      BOUNDARY_DISPLACEMENT,
-        //      BOUNDARY_FORCE_NEXT_CASE,
-        //      BOUNDARY_FORCE,
-
-        node_data[BOUNDARY_IS_CONSTRAINED_NEXT_CASE]
-            .init(model->max_node_count * 3, model->max_node_count)
-            .even(3);
-        node_data[BOUNDARY_IS_CONSTRAINED]
-            .init(model->max_node_count * 3, model->max_node_count)
-            .even(3);
-        node_data[BOUNDARY_DISPLACEMENT_NEXT_CASE]
-            .init(model->max_node_count * 3, model->max_node_count)
-            .even(3);
-        node_data[BOUNDARY_DISPLACEMENT]
-            .init(model->max_node_count * 3, model->max_node_count)
-            .even(3);
-        node_data[BOUNDARY_FORCE_NEXT_CASE]
-            .init(model->max_node_count * 3, model->max_node_count)
-            .even(3);
-        node_data[BOUNDARY_FORCE]
-            .init(model->max_node_count * 3, model->max_node_count)
-            .even(3);
-
         // reconstruct boundaries
         reconstructBoundary();
     }
 
     // functions to constraint nodes
-    void constraint(const std::string& set,
-                    Precision x =NAN,
-                    Precision y =NAN,
-                    Precision z =NAN,
-                    bool isTemp =true);
-    void constraint(const std::string& set,
-                   int dimension,
-                   Precision value = NAN,
-                   bool isTemp = true);
-    void constraint(int node_id,
-                    Precision x =NAN,
-                    Precision y =NAN,
-                    Precision z =NAN,
-                    bool isTemp =true);
-    void constraint(int node_id,
-                   int dimension,
-                   Precision value = NAN,
-                   bool isTemp = true);
+    void constraint(const std::string& set, Precision x = NAN, Precision y = NAN, Precision z = NAN,bool isTemp = true);
+    void constraint(const std::string& set, int dimension, Precision value = NAN, bool isTemp = true);
+    void constraint(int node_id, Precision x = NAN, Precision y = NAN, Precision z = NAN,bool isTemp = true);
+    void constraint(int node_id, int dimension, Precision value = NAN, bool isTemp = true);
 
     // functions to apply loads to nodes
-    void applyLoad(const std::string& set,
-                    Precision x =NAN,
-                    Precision y =NAN,
-                    Precision z =NAN,
-                    bool isTemp =true);
-    void applyLoad(const std::string& set,
-                   int dimension,
-                   Precision value = NAN,
-                   bool isTemp = true);
-    void applyLoad(int node_id,
-                    Precision x =NAN,
-                    Precision y =NAN,
-                    Precision z =NAN,
-                    bool isTemp =true);
-    void applyLoad(int node_id,
-                   int dimension,
-                   Precision value = NAN,
-                   bool isTemp = true);
+    void applyLoad(const std::string& set, Precision x = NAN, Precision y = NAN, Precision z = NAN,bool isTemp = true);
+    void applyLoad(const std::string& set, int dimension, Precision value = NAN, bool isTemp = true);
+    void applyLoad(int node_id, Precision x = NAN, Precision y = NAN, Precision z = NAN,bool isTemp = true);
+    void applyLoad(int node_id, int dimension, Precision value = NAN, bool isTemp = true);
+
+    // functions to apply simp factor to elements
+    void simp(const std::string& set, Precision rho = 1, Precision p = 1,bool isTemp = true);
+    void simp(int element_id, Precision rho = 1, Precision p = 1,bool isTemp = true);
+
 
     void reconstructBoundary();
 

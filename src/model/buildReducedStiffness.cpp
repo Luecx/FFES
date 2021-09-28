@@ -6,16 +6,16 @@ Eigen::SparseMatrix<Precision> Model::buildReducedStiffnessMatrix(LoadCase* load
 
     std::vector<Eigen::Triplet<Precision>> indices{};
 
-    ASSERT(this     ->node_data[REDUCED_STIFFNESS_INDEX            ].isInitialised());
-    ASSERT(this     ->node_data[BOUNDARY_IMPLIED_DISPLACEMENT_FORCE].isInitialised());
-    ASSERT(load_case->node_data[BOUNDARY_DISPLACEMENT              ].isInitialised());
+    ERROR(this     ->node_data[REDUCED_STIFFNESS_INDEX            ].isInitialised(), UNINITIALISED, "data is not initialised");
+    ERROR(this     ->node_data[BOUNDARY_IMPLIED_DISPLACEMENT_FORCE].isInitialised(), UNINITIALISED, "data is not initialised");
+    ERROR(load_case->node_data[BOUNDARY_DISPLACEMENT              ].isInitialised(), UNINITIALISED, "data is not initialised");
 
     for (auto h : elements) {
 
         // ignore null elements
         if(h == nullptr) continue;
 
-        auto mat        = h->computeLocalStiffness();
+        auto mat        = h->computeLocalStiffness(load_case);
         auto el_n_count = h->nodeCount();
         auto node_ids   = h->nodeIDS();
 

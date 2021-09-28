@@ -22,9 +22,11 @@
 #include <cstring>
 #include <iomanip>
 #include <iostream>
+
 template<typename C> struct ComponentContainerSub{
     C* data;
-    explicit ComponentContainerSub(C* p_data) : data(p_data) {}
+
+    ComponentContainerSub(C* p_data) : data(p_data) {}
 
     C& operator[](int sub_index){
         return data[sub_index];
@@ -37,10 +39,12 @@ template<typename C> struct ComponentContainerSub{
 };
 
 template<typename C> struct ComponentContainer {
-    C*   data            = nullptr;
-    int* indices         = nullptr;
-    int  index_count     = 0;
-    int  data_count      = 0;
+    C*   data             = nullptr;
+    C*   data_permanent   = nullptr;
+
+    int* indices          = nullptr;
+    int  index_count      = 0;
+    int  data_count       = 0;
 
     ComponentContainer() = default;
 
@@ -50,10 +54,11 @@ template<typename C> struct ComponentContainer {
 
     ComponentContainer& init(int p_data_count, int p_index_count) {
         this->cleanUp();
-        this->data        = new C[p_data_count]{};
-        this->indices     = new int[p_index_count]{};
-        this->data_count  = p_data_count;
-        this->index_count = p_index_count;
+        this->data           = new C  [p_data_count ]{};
+        this->data_permanent = new C  [p_data_count ]{};
+        this->indices        = new int[p_index_count]{};
+        this->data_count     = p_data_count;
+        this->index_count    = p_index_count;
         return *this;
     }
 
@@ -67,8 +72,10 @@ template<typename C> struct ComponentContainer {
 
     ComponentContainer& fill(C value){
         for(int i = 0; i < data_count; i++){
-            data[i] = value;
+            data          [i] = value;
+            data_permanent[i] = value;
         }
+
         return *this;
     }
 
@@ -76,20 +83,22 @@ template<typename C> struct ComponentContainer {
         if (this->data_count > 0) {
             delete[] this->data;
             this->data = nullptr;
+            delete[] this->data_permanent;
+            this->data_permanent = nullptr;
             this->data_count = 0;
         }
         if (this->index_count > 0) {
-            this->data = nullptr;
             delete[] this->indices;
+            this->indices = nullptr;
             this->index_count = 0;
         }
     }
 
     uint64_t mem(){
         return 2 * sizeof(int)
-            + sizeof(C*)
+            + sizeof(C*) * 2
             + sizeof(int*)
-            + sizeof(C) * data_count
+            + sizeof(C) * data_count * 2
             + sizeof(int) * index_count;
     }
 
@@ -97,13 +106,31 @@ template<typename C> struct ComponentContainer {
         return data[indices[index] + sub_index];
     }
 
+    void set(int index, int sub_index, C value, bool permanent=true){
+        if(permanent)
+            data_permanent[indices[index]+sub_index] = value;
+        data[indices[index]+sub_index] = value;
+    }
+
     ComponentContainerSub<C> operator[](int index){
         return ComponentContainerSub<C>{&data[indices[index]]};
     }
 
+    ComponentContainerSub<C> operator()(int index){
+        return ComponentContainerSub<C>{data_permanent[indices[index]]};
+    }
+
     ComponentContainer<C>& operator=(const ComponentContainer<C>& other){
-        std::memcpy(data   , other.data   , sizeof(C  ) * data_count);
-        std::memcpy(indices, other.indices, sizeof(int) * index_count);
+        return this->loadFromPrevious(other);
+    }
+
+    ComponentContainer<C>& loadFromPrevious(const ComponentContainer<C>& other){
+        this->cleanUp();
+        if(!other.permanentIsNotZero() || !other.isInitialised()) return *this;
+        this->init(other.data_count, other.index_count);
+        std::memcpy(this->indices       , other.indices       , this->index_count * sizeof(int));
+        std::memcpy(this->data          , other.data_permanent, this->data_count  * sizeof(C));
+        std::memcpy(this->data_permanent, other.data_permanent, this->data_count  * sizeof(C));
         return *this;
     }
 
@@ -129,8 +156,15 @@ template<typename C> struct ComponentContainer {
         this->indices[id+1] = this->indices[id] + size;
     }
 
-    bool isInitialised(){
+    bool isInitialised() const{
         return this->data_count > 0 && this->index_count > 0;
+    }
+
+    bool permanentIsNotZero() const{
+        for(int i = 0; i < data_count; i++){
+            if(data_permanent[i] != 0) return true;
+        }
+        return false;
     }
 };
 

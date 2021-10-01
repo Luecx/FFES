@@ -25,8 +25,8 @@
 #include <ostream>
 
 enum NodeDataEntries{
-    USED,                                   // check if used by any element
     POSITION,                               // coordinates
+    NODE_CONNECTED_ELEMENTS,                // amount of connected elements to a node
 
     // LOAD CASE DATA
     BOUNDARY_IS_CONSTRAINED,                // 1 if boundary displacement is constrained (see below)
@@ -41,7 +41,6 @@ enum NodeDataEntries{
 
 enum NodeDataIntegerEntries{
     REDUCED_STIFFNESS_INDEX,
-    NODE_CONNECTED_ELEMENTS,
     N_MAX_NODE_INT_ENTRIES
 };
 

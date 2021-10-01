@@ -17,10 +17,12 @@ add_executable(FEM
                                                 src/model/manageEntities.cpp
                                                 src/model/manageSets.cpp
                                                 src/model/postProcessDisplacements.cpp
-        src/entity/Element.h
+        src/entity/Element.h                    src/entity/Element.cpp
+        src/entity/IsoElement.h                 src/entity/IsoElementImplementation.h
         src/entity/Iso2DTri3.h                  src/entity/Iso2DTri3.cpp
         src/entity/Iso2DQuad4.h                 src/entity/Iso2DQuad4.cpp
         src/entity/Iso3DHex8.h                  src/entity/Iso3DHex8.cpp
+        src/entity/Iso3DHex20.h                 src/entity/Iso3DHex20.cpp
         src/matrix/DenseMatrix.h
         src/matrix/Inverse.h
         src/matrix/QuickMatrix.h
@@ -41,7 +43,7 @@ add_executable(FEM
         src/material/Elasticity.h
         src/material/IsotropicElasticity.h      src/material/IsotropicElasticity.cpp
         src/integration/Quadrature.h
-        src/solver/CG.h                         src/solver/CG.cpp src/system/topo_opt/TOCase.h src/system/manageSimp.cpp src/entity/Element.cpp src/entity/IsoElement.cpp src/entity/IsoElement.h src/entity/IsoElementImplementation.h)
+        src/solver/CG.h                         src/solver/CG.cpp src/system/topo_opt/TOCase.h src/system/manageSimp.cpp)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wshadow -Wno-unused-parameter")

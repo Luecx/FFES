@@ -5,11 +5,12 @@
 
 #include "../assert/Error.h"
 #include "../assert/Warning.h"
+#include "../core/ElementData.h"
 #include "../core/NodeData.h"
 #include "../core/Set.h"
+#include "../eigen/SparseCore"
 #include "../entity/Element.h"
 #include "../material/Material.h"
-#include "../eigen/SparseCore"
 
 #include <vector>
 
@@ -18,6 +19,8 @@ struct LoadCase;
 struct Model {
 
     NodeData               node_data {};
+    ElementData            element_data {};
+
     std::vector<Element*>  elements {};
     std::vector<Material*> materials {};
 
@@ -38,8 +41,9 @@ struct Model {
         : max_node_count   (p_node_count),
           max_element_count(p_element_count) {
 
-        node_data[POSITION                           ].init(max_node_count * 3, max_node_count).even(3);
-        node_data[BOUNDARY_IMPLIED_DISPLACEMENT_FORCE].init(max_node_count * 3, max_node_count).even(3);
+        node_data   [POSITION                           ].init(max_node_count * 3, max_node_count)  .even(3);
+        node_data   [BOUNDARY_IMPLIED_DISPLACEMENT_FORCE].init(max_node_count * 3, max_node_count)  .even(3);
+        element_data[ELEMENT_THICKNESS                  ].init(max_element_count, max_element_count).even(1).fill(1);
 
         elements.resize(max_element_count);
         for(int i = 0; i < max_element_count; i++) elements[i] = nullptr;
@@ -71,7 +75,7 @@ struct Model {
         ERROR(this->elements[id] == nullptr, DUPLICATE_ELEMENT_ID, id)
 
         this->elements[id] = el;
-        this->elements[id]->node_data = &node_data;
+        this->elements[id]->model = this;
         this->elements[id]->element_id = id;
 
         this->element_sets[0                 ].ids.push_back(id);
@@ -92,7 +96,7 @@ struct Model {
     ID getElementSetID(const std::string& name);
 
     // assign materials to elements
-    void solidSection(const std::string& set, const std::string& material);
+    void solidSection(const std::string& set, const std::string& material, Precision thickness=1);
 
     // build global stiffness matrix
     Eigen::SparseMatrix<Precision> buildReducedStiffnessMatrix(LoadCase* load_case);

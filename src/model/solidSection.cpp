@@ -1,7 +1,7 @@
 
 #include "Model.h"
 
-void Model::solidSection(const std::string& set, const std::string& material) {
+void Model::solidSection(const std::string& set, const std::string& material, Precision thickness) {
     ID set_id = getElementSetID(set);
     ID mat_id = getMaterialID(material);
 
@@ -12,6 +12,7 @@ void Model::solidSection(const std::string& set, const std::string& material) {
 
     for(auto id:element_sets[set_id].ids){
         elements[id]->material = materials[mat_id];
+        element_data[ELEMENT_THICKNESS][id][0] = thickness;
     }
 }
 

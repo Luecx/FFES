@@ -43,7 +43,7 @@ add_executable(FEM
         src/material/Elasticity.h
         src/material/IsotropicElasticity.h      src/material/IsotropicElasticity.cpp
         src/integration/Quadrature.h
-        src/solver/CG.h                         src/solver/CG.cpp src/system/topo_opt/TOCase.h src/system/manageSimp.cpp)
+        src/solver/CG.h                         src/solver/CG.cpp src/system/topo_opt/TOCase.h src/system/manageSimp.cpp src/entity/Iso2DQuad8.cpp)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wshadow -Wno-unused-parameter")

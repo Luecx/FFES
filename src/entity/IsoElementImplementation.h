@@ -24,6 +24,7 @@
 #define FEM_SRC_ENTITY_ISOELEMENTIMPLEMENTATION_H_
 
 #include "IsoElement.h"
+#include "../model/Model.h"
 
 template<int N, int D>
 template<int DIMS>
@@ -47,7 +48,7 @@ QuickMatrix<N * DIMS, 1> IsoElement<N, D>::getNodalData(NodeDataEntries entry, L
 template<int N, int D>
 template<int DIMS>
 QuickMatrix<N * DIMS, 1> IsoElement<N, D>::getNodalData(NodeDataEntries entry) {
-    return this->getNodalData<DIMS>(entry, this->node_data);
+    return this->getNodalData<DIMS>(entry, &this->model->node_data);
 }
 
 template<int N, int D>
@@ -153,7 +154,8 @@ DenseMatrix IsoElement<N, D>::computeLocalStiffness(LoadCase* load_case) {
 
         Precision det = 0;
         auto      B   = computeStrainDisplacementRelation(node_coords, det, r, s, t);
-        stiffness += (!B * mat * B) * (integration(i, integration.getN() - 1) * det);
+        stiffness += (!B * mat * B) * (integration(i, integration.getN() - 1) * det
+                                       * model->element_data[ELEMENT_THICKNESS][element_id][0]);
     }
 
     return stiffness;

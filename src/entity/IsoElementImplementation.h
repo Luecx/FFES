@@ -16,40 +16,11 @@
  *                                                                                                  *
  ****************************************************************************************************/
 
-//
-// Created by Luecx on 27.09.2021.
-//
-
 #ifndef FEM_SRC_ENTITY_ISOELEMENTIMPLEMENTATION_H_
 #define FEM_SRC_ENTITY_ISOELEMENTIMPLEMENTATION_H_
 
 #include "IsoElement.h"
 #include "../model/Model.h"
-
-template<int N, int D>
-template<int DIMS>
-QuickMatrix<N * DIMS, 1> IsoElement<N, D>::getNodalData(NodeDataEntries entry,
-                                                        NodeData*       p_node_data) {
-    QuickMatrix<N * DIMS, 1> matrix {};
-    for (int i = 0; i < nodeCount(); i++) {
-        for (int j = 0; j < DIMS; j++) {
-            matrix(i * DIMS + j, 0) = (*p_node_data)[entry][nodeIDS()[i]][j];
-        }
-    }
-    return matrix;
-}
-
-template<int N, int D>
-template<int DIMS>
-QuickMatrix<N * DIMS, 1> IsoElement<N, D>::getNodalData(NodeDataEntries entry, LoadCase* load_case) {
-    return this->getNodalData<DIMS>(entry, &load_case->node_data);
-}
-
-template<int N, int D>
-template<int DIMS>
-QuickMatrix<N * DIMS, 1> IsoElement<N, D>::getNodalData(NodeDataEntries entry) {
-    return this->getNodalData<DIMS>(entry, &this->model->node_data);
-}
 
 template<int N, int D>
 QuickMatrix<D, D> IsoElement<N, D>::getJacobian(QuickMatrix<N, D>& node_coords,
@@ -162,19 +133,45 @@ DenseMatrix IsoElement<N, D>::computeLocalStiffness(LoadCase* load_case) {
 }
 
 template<int N, int D>
-DenseMatrix IsoElement<N, D>::computeStress(LoadCase*          load_case,
-                                            const DenseMatrix& evaluation_points) {
+DenseMatrix IsoElement<N, D>::computeLocalMassMatrix(LoadCase* load_case) {
+//    QuickMatrix<N * D, N * D> mass_matrix {};
+//    auto                      mat         = getAdjustedMaterialMatrix(load_case);
+//    auto                      node_coords = getNodalData(POSITION).template reshape<N, D>();
+//    auto                      integration = getIntegrationScheme();
+//
+//    for (int i = 0; i < integration.getM(); i++) {
+//        Precision r = integration(i, 0);
+//        Precision s = integration(i, 1);
+//        Precision t = integration(i, 2);
+//
+//        if (D == 2)
+//            t = 0;
+//
+//        Precision det = 0;
+//        auto      B   = computeStrainDisplacementRelation(node_coords, det, r, s, t);
+//        stiffness += (!B * mat * B) * (integration(i, integration.getN() - 1) * det
+//            * model->element_data[ELEMENT_THICKNESS][element_id][0]);
+//    }
+//
+//    return stiffness;
+    // TODO
+}
 
-    DenseMatrix stresses {DIM_TRAF(D), evaluation_points.getM()};
-    auto mat_matrix = getAdjustedMaterialMatrix(load_case);
+template<int N, int D>
+DenseMatrix IsoElement<N, D>::computeStressAtNodes(LoadCase* load_case) {
 
-    auto                      node_coords = getNodalData(POSITION).template reshape<N, D>();
-    auto                      disp_vector = getNodalData(DISPLACEMENT, load_case);
+    DenseMatrix stresses {N, DIM_TRAF(D)};
+    auto        mat_matrix  = getAdjustedMaterialMatrix(load_case);
 
-    for (int i = 0; i < evaluation_points.getM(); i++) {
-        Precision r      = evaluation_points.get(i, 0);
-        Precision s      = evaluation_points.get(i, 1);
-        Precision t      = evaluation_points.get(i, 2);
+    auto        node_coords = getNodalData(POSITION).template reshape<N, D>();
+    auto        disp_vector = getNodalData(DISPLACEMENT, load_case);
+
+    auto        points      = this->getNodeLocalCoordinates();
+
+    for (int i = 0; i < points.getM(); i++) {
+        Precision r      = points.get(i, 0);
+        Precision s      = points.get(i, 1);
+        Precision t      = points.get(i, 2);
         Precision det    = 0;
 
         if (D == 2)
@@ -185,7 +182,7 @@ DenseMatrix IsoElement<N, D>::computeStress(LoadCase*          load_case,
         auto      stress = mat_matrix * strain;
 
         for (int j = 0; j < stress.getM(); j++) {
-            stresses(j, i) = stress(j, 0);
+            stresses(i, j) = stress(j, 0);
         }
     }
     return stresses;
@@ -205,6 +202,16 @@ Precision IsoElement<N, D>::compliance(LoadCase* load_case) {
     auto stiffness = computeLocalStiffness(load_case);
     auto disp      = DenseMatrix(getNodalData(DISPLACEMENT, load_case));
     return (!disp * stiffness * disp)(0,0);
+}
+
+template<int N, int D>
+Precision IsoElement<N, D>::interpolate(DenseMatrix nodal, Precision r, Precision s, Precision t) {
+    auto shape_function = this->getShapeFunction(r,s,t);
+    Precision res{};
+    for(int i = 0; i < shape_function.getM(); i++){
+        res += shape_function(i,0) * nodal(i,0);
+    }
+    return 0;
 }
 
 template<int N, int D>
@@ -268,6 +275,31 @@ DenseMatrix IsoElement<N, D>::getNodalData(NodeDataEntries entry,
         default:
             return getNodalData<1>(entry);
     }
+}
+
+template<int N, int D>
+template<int DIMS>
+QuickMatrix<N * DIMS, 1> IsoElement<N, D>::getNodalData(NodeDataEntries entry,
+                                                        NodeData*       p_node_data) {
+    QuickMatrix<N * DIMS, 1> matrix {};
+    for (int i = 0; i < nodeCount(); i++) {
+        for (int j = 0; j < DIMS; j++) {
+            matrix(i * DIMS + j, 0) = (*p_node_data)[entry][nodeIDS()[i]][j];
+        }
+    }
+    return matrix;
+}
+
+template<int N, int D>
+template<int DIMS>
+QuickMatrix<N * DIMS, 1> IsoElement<N, D>::getNodalData(NodeDataEntries entry, LoadCase* load_case) {
+    return this->getNodalData<DIMS>(entry, &load_case->node_data);
+}
+
+template<int N, int D>
+template<int DIMS>
+QuickMatrix<N * DIMS, 1> IsoElement<N, D>::getNodalData(NodeDataEntries entry) {
+    return this->getNodalData<DIMS>(entry, &this->model->node_data);
 }
 
 #endif    // FEM_SRC_ENTITY_ISOELEMENTIMPLEMENTATION_H_

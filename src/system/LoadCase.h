@@ -63,6 +63,7 @@ struct LoadCase {
         auto vector = model->buildReducedLoadVector(this);
         auto solution = conjugate_gradient(matrix, vector);
         model->postProcessDisplacements(solution, this);
+        model->computeStressAtNodes(this);
     }
 };
 

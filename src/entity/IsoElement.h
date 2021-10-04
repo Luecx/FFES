@@ -33,18 +33,28 @@ struct IsoElement : public Element {
 
     ID node_ids[N] {};
 
-    template<int DIMS = D>
-    QuickMatrix<N * DIMS, 1> getNodalData(NodeDataEntries entry, NodeData* p_node_data);
+    // computes the shape functions at position r,s,t for each node
+    virtual QuickMatrix<N, 1> getShapeFunction(Precision r, Precision s, Precision t)            = 0;
 
-    template<int DIMS = D>
-    QuickMatrix<N * DIMS, 1> getNodalData(NodeDataEntries entry, LoadCase* load_case);
+    // containing derivatives of the shape functions h1 -> h8 with respect to r/s/t
+    virtual QuickMatrix<D, N> getLocalShapeDerivative(Precision r, Precision s, Precision t = 0) = 0;
 
-    template<int DIMS = D>
-    QuickMatrix<N * DIMS, 1> getNodalData(NodeDataEntries entry);
+    // computes the strain displacement matrix B from source
+    // (already knowing the entries but just shaping)
+    virtual QuickMatrix<DIM_TRAF(D), N * D>
+                        computeStrainDisplacementRelationFromSource(QuickMatrix<D, N> b_help) = 0;
+
+    // returns the integration scheme over this element
+    virtual DenseMatrix getIntegrationScheme()                                                = 0;
+
+    // returns the local coordinates of the nodes
+    virtual QuickMatrix<N,D> getNodeLocalCoordinates()                                        = 0;
 
     // containing derivatives of x,y,z with respect to r/s/t
-    virtual QuickMatrix<D, D>
-        getJacobian(QuickMatrix<N, D>& node_coords, Precision r, Precision s, Precision t = 0);
+    virtual QuickMatrix<D, D> getJacobian(QuickMatrix<N, D>& node_coords,
+                                          Precision r,
+                                          Precision s,
+                                          Precision t = 0);
 
     // containing derivatives of x,y,z with respect to r/s/t
     virtual QuickMatrix<D, D> getJacobian(Precision r, Precision s, Precision t);
@@ -58,33 +68,28 @@ struct IsoElement : public Element {
                                           Precision          t = 0);
 
     // returns the material matrix and adjusts it by simp factors
-    virtual QuickMatrix<DIM_TRAF(D), DIM_TRAF(D)>
-                              getAdjustedMaterialMatrix(LoadCase* load_case = nullptr);
+    virtual QuickMatrix<DIM_TRAF(D), DIM_TRAF(D)> getAdjustedMaterialMatrix(LoadCase* load_case = nullptr);
 
-    // containing derivatives of the shape functions h1 -> h8 with respect to r/s/t
-    virtual QuickMatrix<D, N> getLocalShapeDerivative(Precision r, Precision s, Precision t = 0) = 0;
-
-    // computes the strain displacement matrix B from source
-    // (already knowing the entries but just shaping)
-    virtual QuickMatrix<DIM_TRAF(D), N * D>
-                        computeStrainDisplacementRelationFromSource(QuickMatrix<D, N> b_help) = 0;
-
-    virtual DenseMatrix getIntegrationScheme() override                                       = 0;
-
-    Precision           compliance(LoadCase* load_case) override;
-
-    DenseMatrix         computeLocalStiffness(LoadCase* load_case) override;
-    DenseMatrix         computeStress(LoadCase* load_case, const DenseMatrix& evaluation_points) override;
+    Precision   compliance(LoadCase* load_case) override;
+    Precision   interpolate(DenseMatrix nodal, Precision r, Precision s, Precision t) override;
+    DenseMatrix computeLocalStiffness(LoadCase* load_case) override;
+    DenseMatrix computeLocalMassMatrix(LoadCase* load_case) override;
+    DenseMatrix computeStressAtNodes(LoadCase* load_case) override;
 
     int         nodeDOF() override;
     int         nodeCount() override;
     int*        nodeIDS() override;
 
-    virtual DenseMatrix getNodalData(NodeDataEntries entry, NodeData* p_node_data, int dim_count) override;
-    virtual DenseMatrix getNodalData(NodeDataEntries entry, LoadCase* load_case, int dim_count) override;
-    virtual DenseMatrix getNodalData(NodeDataEntries entry, int dim_count) override;
+    DenseMatrix getNodalData(NodeDataEntries entry, NodeData* p_node_data, int dim_count) override;
+    DenseMatrix getNodalData(NodeDataEntries entry, LoadCase* load_case, int dim_count) override;
+    DenseMatrix getNodalData(NodeDataEntries entry, int dim_count) override;
+
+    template<int DIMS = D>
+    QuickMatrix<N * DIMS, 1> getNodalData(NodeDataEntries entry, NodeData* p_node_data);
+    template<int DIMS = D>
+    QuickMatrix<N * DIMS, 1> getNodalData(NodeDataEntries entry, LoadCase* load_case);
+    template<int DIMS = D>
+    QuickMatrix<N * DIMS, 1> getNodalData(NodeDataEntries entry);
 };
-
-
 
 #endif    // FEM_SRC_ENTITY_ISOELEMENT_H_

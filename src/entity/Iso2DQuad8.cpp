@@ -82,3 +82,39 @@ QuickMatrix<3, 16> Iso2DQuad8::computeStrainDisplacementRelationFromSource(Quick
     return B;
 }
 DenseMatrix Iso2DQuad8::getIntegrationScheme() { return integrate<ISO_QUAD, QUADRATIC>(); }
+QuickMatrix<8, 1> Iso2DQuad8::getShapeFunction(Precision r, Precision s, Precision t) {
+    QuickMatrix<8, 1> res {};
+    res(0,0) = (1-r)*(1-s)*(-r-s-1);
+    res(1,0) = (1+r)*(1-s)*( r-s-1);
+    res(2,0) = (1+r)*(1+s)*( r+s-1);
+    res(3,0) = (1-r)*(1+s)*(-r+s-1);
+
+    res(4,0) = (1-s)*(1+r)*(1-r);
+    res(5,0) = (1+r)*(1+s)*(1-s);
+    res(6,0) = (1+s)*(1+r)*(1-r);
+    res(7,0) = (1-r)*(1+s)*(1-s);
+
+    res * 0.25;
+    return res;
+}
+QuickMatrix<8, 2> Iso2DQuad8::getNodeLocalCoordinates() {
+    QuickMatrix<8, 2> res{};
+    res(0,0) = -1;
+    res(0,1) = -1;
+    res(1,0) =  1;
+    res(1,1) = -1;
+    res(2,0) =  1;
+    res(2,1) =  1;
+    res(3,0) = -1;
+    res(3,1) =  1;
+
+    res(4,0) =  0;
+    res(4,1) = -1;
+    res(5,0) =  1;
+    res(5,1) =  0;
+    res(6,0) =  0;
+    res(6,1) =  1;
+    res(7,0) = -1;
+    res(7,1) =  0;
+    return res;
+}

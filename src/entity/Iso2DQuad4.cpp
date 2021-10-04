@@ -13,14 +13,14 @@ Iso2DQuad4::Iso2DQuad4(int node_1, int node_2, int node_3, int node_4){
 }
 QuickMatrix<2, 4> Iso2DQuad4::getLocalShapeDerivative(Precision r, Precision s, Precision t) {
     QuickMatrix<2,4> local_shape_derivative{};
-    local_shape_derivative(0,0) =  s + 1;
-    local_shape_derivative(1,0) =  r + 1;
-    local_shape_derivative(0,1) = -s - 1;
-    local_shape_derivative(1,1) =  1 - r;
-    local_shape_derivative(0,2) =  s - 1;
-    local_shape_derivative(1,2) =  r - 1;
-    local_shape_derivative(0,3) =  1 - s;
-    local_shape_derivative(1,3) = -r - 1;
+    local_shape_derivative(0,0) =  s - 1;
+    local_shape_derivative(1,0) =  r - 1;
+    local_shape_derivative(0,1) =  1 - s;
+    local_shape_derivative(1,1) = -r - 1;
+    local_shape_derivative(0,2) =  1 + s;
+    local_shape_derivative(1,2) =  1 + r;
+    local_shape_derivative(0,3) = -s - 1;
+    local_shape_derivative(1,3) =  1 - r;
     local_shape_derivative *= 0.25;
     return local_shape_derivative;
 }
@@ -37,4 +37,26 @@ QuickMatrix<3, 8> Iso2DQuad4::computeStrainDisplacementRelationFromSource(QuickM
     return B;
 }
 DenseMatrix Iso2DQuad4::getIntegrationScheme() { return integrate<ISO_QUAD, LINEAR>(); }
+QuickMatrix<4, 1> Iso2DQuad4::getShapeFunction(Precision r, Precision s, Precision t) {
+    QuickMatrix<4, 1> res{};
 
+    res(0,0) = (1-r)*(1-t);
+    res(1,0) = (1+r)*(1-t);
+    res(2,0) = (1+r)*(1+t);
+    res(3,0) = (1-r)*(1+t);
+    
+    res *= 1.0/4.0;
+    return res;
+}
+QuickMatrix<4, 2> Iso2DQuad4::getNodeLocalCoordinates() {
+    QuickMatrix<4, 2> res{};
+    res(0,0) = -1;
+    res(0,1) = -1;
+    res(1,0) =  1;
+    res(1,1) = -1;
+    res(2,0) =  1;
+    res(2,1) =  1;
+    res(3,0) = -1;
+    res(3,1) =  1;
+    return res;
+}

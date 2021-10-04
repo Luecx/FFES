@@ -22,7 +22,9 @@ struct Iso3DHex8 : public IsoElement<8, 3> {
 
     QuickMatrix<3, 8>  getLocalShapeDerivative(Precision r, Precision s, Precision t) override;
     QuickMatrix<6, 24> computeStrainDisplacementRelationFromSource(QuickMatrix<3, 8> b_help) override;
+    QuickMatrix<8, 1>  getShapeFunction(Precision r, Precision s, Precision t) override;
     DenseMatrix        getIntegrationScheme() override;
+    QuickMatrix<8, 3>  getNodeLocalCoordinates() override;
 };
 
 #endif    // FEM_SRC_ENTITY_ISO2DQUAD4_H_

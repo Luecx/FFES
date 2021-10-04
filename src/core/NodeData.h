@@ -35,7 +35,7 @@ enum NodeDataEntries{
 
     BOUNDARY_IMPLIED_DISPLACEMENT_FORCE,    // force implied due to displacements
     DISPLACEMENT,                           // displacement in final solution
-    STRESS,
+    NODAL_STRESS,
     N_MAX_NODE_FLOAT_ENTRIES
 };
 

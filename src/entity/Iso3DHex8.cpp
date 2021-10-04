@@ -73,3 +73,42 @@ QuickMatrix<6, 24> Iso3DHex8::computeStrainDisplacementRelationFromSource(QuickM
 }
 
 DenseMatrix Iso3DHex8::getIntegrationScheme() { return integrate<ISO_HEX, LINEAR>(); }
+QuickMatrix<8, 1> Iso3DHex8::getShapeFunction(Precision r, Precision s, Precision t) {
+    QuickMatrix<8,1> res{};
+
+    Precision         rp = r + 1;
+    Precision         sp = s + 1;
+    Precision         tp = t + 1;
+    Precision         rm = r - 1;
+    Precision         sm = s - 1;
+    Precision         tm = t - 1;
+
+    // shape function evaluation. 4 entries for 1) sign, 2) r 3) s 4) t
+    for (int n = 0; n < 8; n++) {
+        Precision sign = (n == 0 || n == 2 || n == 5 || n == 7) ? -1 : 1;
+        Precision r1   = ((n + 1) / 2) % 2 == 1 ? rp : rm;
+        Precision s1   = ((n) / 2) % 2 == 1 ? sp : sm;
+        Precision t1   = n >= 4 ? tp : tm;
+
+        res(n,0) = sign * r1 * s1 * t1;
+    }
+
+    res *= 0.125;
+    return res;
+}
+QuickMatrix<8, 3> Iso3DHex8::getNodeLocalCoordinates() {
+    QuickMatrix<8, 3> res{};
+
+    for (int n = 0; n < 8; n++) {
+        Precision r1   = ((n + 1) / 2) % 2 == 1 ? -1 : 1;
+        Precision s1   = ((n) / 2) % 2 == 1 ? -1 : 1;
+        Precision t1   = n >= 4 ? -1 : 1;
+
+        res(n,0) = r1;
+        res(n,1) = s1;
+        res(n,2) = t1;
+    }
+
+    return res;
+
+}

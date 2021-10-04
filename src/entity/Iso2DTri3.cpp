@@ -40,4 +40,20 @@ QuickMatrix<3, 6> Iso2DTri3::computeStrainDisplacementRelationFromSource(QuickMa
 }
 
 DenseMatrix Iso2DTri3::getIntegrationScheme() { return integrate<ISO_TRI, LINEAR>(); }
+QuickMatrix<3, 1> Iso2DTri3::getShapeFunction(Precision r, Precision s, Precision t) {
+    QuickMatrix<3,1> res{};
+    res(0,0) = 1 - r - s;
+    res(1,0) = r;
+    res(2,0) = s;
+}
+QuickMatrix<3, 2> Iso2DTri3::getNodeLocalCoordinates() {
+    QuickMatrix<3, 2> res{};
 
+    res(0,0) = 0;
+    res(0,1) = 0;
+    res(1,0) = 1;
+    res(1,1) = 0;
+    res(2,0) = 0;
+    res(2,1) = 1;
+    return res;
+}

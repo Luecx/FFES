@@ -132,6 +132,16 @@ class Reader {
                 auto n3 = std::stoi(line_data.csv[3]) - 1;
                 auto n4 = std::stoi(line_data.csv[4]) - 1;
                 sys->model.setElement<Iso2DQuad4>(id, n1, n2, n3, n4);
+            } else if (type == "C2D8") {
+                auto n1 = std::stoi(line_data.csv[1]) - 1;
+                auto n2 = std::stoi(line_data.csv[2]) - 1;
+                auto n3 = std::stoi(line_data.csv[3]) - 1;
+                auto n4 = std::stoi(line_data.csv[4]) - 1;
+                auto n5 = std::stoi(line_data.csv[5]) - 1;
+                auto n6 = std::stoi(line_data.csv[6]) - 1;
+                auto n7 = std::stoi(line_data.csv[7]) - 1;
+                auto n8 = std::stoi(line_data.csv[8]) - 1;
+                sys->model.setElement<Iso2DQuad8>(id, n1, n2, n3, n4, n5, n6, n7, n8);
             } else {
 
                 ERROR(false, PARSING_SYNTAX_ERROR, "element type not known: " << type);

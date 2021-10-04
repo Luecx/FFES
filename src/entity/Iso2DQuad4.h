@@ -16,6 +16,8 @@ struct Iso2DQuad4 : public IsoElement<4, 2> {
     QuickMatrix<2, 4> getLocalShapeDerivative(Precision r, Precision s, Precision t) override;
     QuickMatrix<3, 8> computeStrainDisplacementRelationFromSource(QuickMatrix<2, 4> b_help) override;
     DenseMatrix       getIntegrationScheme() override;
+    QuickMatrix<4, 1> getShapeFunction(Precision r, Precision s, Precision t) override;
+    QuickMatrix<4, 2> getNodeLocalCoordinates() override;
 
     //    DenseMatrix computeLocalStiffness(LoadCase* load_case) override;
     //    DenseMatrix computeStress(LoadCase* load_case, const DenseMatrix& evaluation_points)

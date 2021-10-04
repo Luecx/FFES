@@ -16,15 +16,8 @@ struct Iso2DTri3 : public IsoElement<3, 2> {
     QuickMatrix<2, 3> getLocalShapeDerivative(Precision r, Precision s, Precision t) override;
     QuickMatrix<3, 6> computeStrainDisplacementRelationFromSource(QuickMatrix<2, 3> b_help) override;
     DenseMatrix       getIntegrationScheme() override;
-
-    //    DenseMatrix       computeLocalStiffness(LoadCase* load_case) override;
-    //    QuickMatrix<2, 2> computeJacobian();
-    //    DenseMatrix       computeStress(LoadCase* load_case, const DenseMatrix& evaluation_points)
-    //    override; DenseMatrix       getIntegrationScheme() override;
-    //
-    //    int               nodeDOF() override;
-    //    int               nodeCount() override;
-    //    int*              nodeIDS() override;
+    QuickMatrix<3, 1> getShapeFunction(Precision r, Precision s, Precision t) override;
+    QuickMatrix<3, 2> getNodeLocalCoordinates() override;
 };
 
 #endif    // FEM_SRC_ENTITY_ISO2DTRI3_H_

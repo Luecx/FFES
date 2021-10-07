@@ -13,12 +13,16 @@ Iso2DTri3::Iso2DTri3(int node_1, int node_2, int node_3){
 
 QuickMatrix<2, 3> Iso2DTri3::getLocalShapeDerivative(Precision r, Precision s, Precision t) {
     QuickMatrix<2, 3> res{};
-    res(0, 0) = -1;
-    res(0, 1) =  1;
-    res(0, 2) =  0;
-    res(1, 0) = -1;
-    res(1, 1) =  0;
-    res(1, 2) =  1;
+    res(0,0) = 1;
+    res(1,0) = 0;
+
+    res(0,1) = 0;
+    res(1,1) = 1;
+
+    res(0,2) = -1;
+    res(1,2) = -1;
+
+
     return res;
 }
 
@@ -42,18 +46,19 @@ QuickMatrix<3, 6> Iso2DTri3::computeStrainDisplacementRelationFromSource(QuickMa
 DenseMatrix Iso2DTri3::getIntegrationScheme() { return integrate<ISO_TRI, LINEAR>(); }
 QuickMatrix<3, 1> Iso2DTri3::getShapeFunction(Precision r, Precision s, Precision t) {
     QuickMatrix<3,1> res{};
-    res(0,0) = 1 - r - s;
-    res(1,0) = r;
-    res(2,0) = s;
+    res(0,0) = r;
+    res(1,0) = s;
+    res(2,0) = 1-r-s;
+    return res;
 }
 QuickMatrix<3, 2> Iso2DTri3::getNodeLocalCoordinates() {
     QuickMatrix<3, 2> res{};
 
-    res(0,0) = 0;
+    res(0,0) = 1;
     res(0,1) = 0;
-    res(1,0) = 1;
-    res(1,1) = 0;
+    res(1,0) = 0;
+    res(1,1) = 1;
     res(2,0) = 0;
-    res(2,1) = 1;
+    res(2,1) = 0;
     return res;
 }

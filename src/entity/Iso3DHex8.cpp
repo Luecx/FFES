@@ -100,9 +100,9 @@ QuickMatrix<8, 3> Iso3DHex8::getNodeLocalCoordinates() {
     QuickMatrix<8, 3> res{};
 
     for (int n = 0; n < 8; n++) {
-        Precision r1   = ((n + 1) / 2) % 2 == 1 ? -1 : 1;
-        Precision s1   = ((n) / 2) % 2 == 1 ? -1 : 1;
-        Precision t1   = n >= 4 ? -1 : 1;
+        Precision r1   = ((n + 1) / 2) % 2 == 0 ? -1 : 1;
+        Precision s1   = ((n) / 2) % 2 == 0 ? -1 : 1;
+        Precision t1   = n >= 4 ? 1 : -1;
 
         res(n,0) = r1;
         res(n,1) = s1;

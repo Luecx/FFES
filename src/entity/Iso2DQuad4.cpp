@@ -40,12 +40,12 @@ DenseMatrix Iso2DQuad4::getIntegrationScheme() { return integrate<ISO_QUAD, LINE
 QuickMatrix<4, 1> Iso2DQuad4::getShapeFunction(Precision r, Precision s, Precision t) {
     QuickMatrix<4, 1> res{};
 
-    res(0,0) = (1-r)*(1-t);
-    res(1,0) = (1+r)*(1-t);
-    res(2,0) = (1+r)*(1+t);
-    res(3,0) = (1-r)*(1+t);
+    res(0,0) = (1-r)*(1-s);
+    res(1,0) = (1+r)*(1-s);
+    res(2,0) = (1+r)*(1+s);
+    res(3,0) = (1-r)*(1+s);
     
-    res *= 1.0/4.0;
+    res *= 0.25;
     return res;
 }
 QuickMatrix<4, 2> Iso2DQuad4::getNodeLocalCoordinates() {

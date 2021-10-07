@@ -11,7 +11,6 @@
 
 struct Iso2DTri3 : public IsoElement<3, 2> {
 
-    int node_ids[3];
     Iso2DTri3(int node_1, int node_2, int node_3);
     QuickMatrix<2, 3> getLocalShapeDerivative(Precision r, Precision s, Precision t) override;
     QuickMatrix<3, 6> computeStrainDisplacementRelationFromSource(QuickMatrix<2, 3> b_help) override;

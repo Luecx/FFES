@@ -110,8 +110,8 @@ inline QuickMatrix<2, 2> inverse2x2(QuickMatrix<2, 2> A, Precision& determinant)
     QuickMatrix<2,2> inverse{};
     inverse(0,0) =   1/determinant * A(1,1);
     inverse(1,1) =   1/determinant * A(0,0);
-    inverse(0,1) =  -1/determinant * A(1,0);
-    inverse(1,0) =  -1/determinant * A(0,1);
+    inverse(0,1) =  -1/determinant * A(0,1);
+    inverse(1,0) =  -1/determinant * A(1,0);
 
     return inverse;
 }

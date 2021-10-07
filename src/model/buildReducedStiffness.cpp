@@ -16,6 +16,7 @@ Eigen::SparseMatrix<Precision> Model::buildReducedStiffnessMatrix(LoadCase* load
         if(h == nullptr) continue;
 
         auto mat        = h->computeLocalStiffness(load_case);
+
         auto el_n_count = h->nodeCount();
         auto node_ids   = h->nodeIDS();
 

@@ -30,15 +30,17 @@ QuickMatrix<D, D> IsoElement<N, D>::getJacobian(QuickMatrix<N, D>& node_coords,
 
     QuickMatrix<D, N> local_shape_derivative = getLocalShapeDerivative(r, s, t);
     QuickMatrix<D, D> jacobian {};
-    for (int j = 0; j < D; j++) {
-        for (int n = 0; n < D; n++) {
-            Precision sum = 0;
-            for (int b = 0; b < N; b++) {
-                sum += node_coords(b, n) * local_shape_derivative(j, b);
+
+    for(int m = 0; m < D; m++){
+        for(int n = 0; n < D; n++){
+            Precision dxn_drm = 0;
+            for(int k = 0; k < N; k++){
+                dxn_drm += node_coords(k, n) * local_shape_derivative(m, k);
             }
-            jacobian(j, n) = sum;
+            jacobian(m, n) = dxn_drm;
         }
     }
+
     return jacobian;
 }
 
@@ -76,6 +78,7 @@ QuickMatrix<DIM_TRAF(D), N * D> IsoElement<N, D>::computeStrainDisplacementRelat
     ERROR(det > 0, NEGATIVE_JACOBIAN, det);
 
     auto B_help = inv * local_shape_derivative;
+
     return computeStrainDisplacementRelationFromSource(B_help);
 }
 
@@ -119,7 +122,6 @@ DenseMatrix IsoElement<N, D>::computeLocalStiffness(LoadCase* load_case) {
         Precision r = integration(i, 0);
         Precision s = integration(i, 1);
         Precision t = integration(i, 2);
-
         if (D == 2)
             t = 0;
 
@@ -155,6 +157,7 @@ DenseMatrix IsoElement<N, D>::computeLocalMassMatrix(LoadCase* load_case) {
 //
 //    return stiffness;
     // TODO
+   return DenseMatrix(0,0);
 }
 
 template<int N, int D>
@@ -185,6 +188,7 @@ DenseMatrix IsoElement<N, D>::computeStressAtNodes(LoadCase* load_case) {
             stresses(i, j) = stress(j, 0);
         }
     }
+
     return stresses;
 }
 

@@ -16,9 +16,8 @@
  *                                                                                                  *
  ****************************************************************************************************/
 #include "Model.h"
-//
-// Created by Luecx on 03.10.2021.
-//
+
+
 void Model::updateNodeConnectedCount() {
     this->node_data[NODE_CONNECTED_ELEMENTS].init(max_node_count, max_node_count).even(1).fill(0);
     for(auto el:elements){

@@ -20,6 +20,7 @@ add_executable(FEM
         src/entity/Element.h                    src/entity/Element.cpp
         src/entity/IsoElement.h                 src/entity/IsoElementImplementation.h
         src/entity/Iso2DTri3.h                  src/entity/Iso2DTri3.cpp
+        src/entity/Iso2DTri6.h                  src/entity/Iso2DTri6.cpp
         src/entity/Iso2DQuad4.h                 src/entity/Iso2DQuad4.cpp
         src/entity/Iso3DHex8.h                  src/entity/Iso3DHex8.cpp
         src/entity/Iso3DHex20.h                 src/entity/Iso3DHex20.cpp

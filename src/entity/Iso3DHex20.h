@@ -32,8 +32,8 @@ struct Iso3DHex20 : public IsoElement<20, 3> {
                int node_19,
                int node_20);
 
-    QuickMatrix<3, 20> getLocalShapeDerivative(Precision r, Precision s, Precision t) override;
-    QuickMatrix<6, 60> computeStrainDisplacementRelationFromSource(QuickMatrix<3, 20> b_help) override;
+    QuickMatrix<20, 3> getLocalShapeDerivative(Precision r, Precision s, Precision t) override;
+    QuickMatrix<6, 60> computeStrainDisplacementRelationFromSource(QuickMatrix<20, 3> b_help) override;
     QuickMatrix<20, 1> getShapeFunction(Precision r, Precision s, Precision t) override;
 
     DenseMatrix        getIntegrationScheme() override;

@@ -17,7 +17,7 @@ Iso3DHex8::Iso3DHex8(int node_1, int node_2, int node_3, int node_4, int node_5,
     node_ids[7] = node_8;
 }
 
-QuickMatrix<3, 8> Iso3DHex8::getLocalShapeDerivative(Precision r, Precision s, Precision t) {
+QuickMatrix<8, 3> Iso3DHex8::getLocalShapeDerivative(Precision r, Precision s, Precision t) {
 
     Precision         rp = r + 1;
     Precision         sp = s + 1;
@@ -27,7 +27,7 @@ QuickMatrix<3, 8> Iso3DHex8::getLocalShapeDerivative(Precision r, Precision s, P
     Precision         tm = t - 1;
 
     // shape function evaluation. 4 entries for 1) sign, 2) r 3) s 4) t
-    QuickMatrix<8, 4> shape_function {};
+    QuickMatrix<4,8> shape_function {};
     for (int n = 0; n < 8; n++) {
         shape_function(n, 0) = (n == 0 || n == 2 || n == 5 || n == 7) ? -1 : 1;
         shape_function(n, 1) = ((n + 1) / 2) % 2 == 1 ? rp : rm;
@@ -36,38 +36,35 @@ QuickMatrix<3, 8> Iso3DHex8::getLocalShapeDerivative(Precision r, Precision s, P
     }
 
     // containing derivatives of the shape functions h1 -> h8 with respect to r/s/t
-    QuickMatrix<3, 8> local_shape_derivative {};
+    QuickMatrix<8, 3> local_shape_derivative {};
     for (int n = 0; n < 8; n++) {
-        local_shape_derivative(0, n) =
+        local_shape_derivative(n, 0) =
             shape_function(n, 0) * shape_function(n, 2) * shape_function(n, 3);
-        local_shape_derivative(1, n) =
+        local_shape_derivative(n, 1) =
             shape_function(n, 0) * shape_function(n, 1) * shape_function(n, 3);
-        local_shape_derivative(2, n) =
+        local_shape_derivative(n, 2) =
             shape_function(n, 0) * shape_function(n, 1) * shape_function(n, 2);
     }
     local_shape_derivative *= 0.125;
     return local_shape_derivative;
 }
 
-QuickMatrix<6, 24> Iso3DHex8::computeStrainDisplacementRelationFromSource(QuickMatrix<3, 8> b_help) {
+QuickMatrix<6, 24> Iso3DHex8::computeStrainDisplacementRelationFromSource(QuickMatrix<8, 3> b_help) {
 
     QuickMatrix<6, 24> B {};
     for (int j = 0; j < 8; j++) {
         int r1   = j * 3;
         int r2   = r1 + 1;
         int r3   = r1 + 2;
-        B(0, r1) = b_help(0, j);
-        B(1, r2) = b_help(1, j);
-        B(2, r3) = b_help(2, j);
-
-        B(3, r1) = b_help(1, j);
-        B(3, r2) = b_help(0, j);
-
-        B(4, r1) = b_help(2, j);
-        B(4, r3) = b_help(0, j);
-
-        B(5, r2) = b_help(2, j);
-        B(5, r3) = b_help(1, j);
+        B(0, r1) = b_help(j,0);
+        B(1, r2) = b_help(j,1);
+        B(2, r3) = b_help(j,2);
+        B(3, r1) = b_help(j,1);
+        B(3, r2) = b_help(j,0);
+        B(4, r1) = b_help(j,2);
+        B(4, r3) = b_help(j,0);
+        B(5, r2) = b_help(j,2);
+        B(5, r3) = b_help(j,1);
     }
     return B;
 }

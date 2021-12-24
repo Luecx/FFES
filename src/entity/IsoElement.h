@@ -37,12 +37,12 @@ struct IsoElement : public Element {
     virtual QuickMatrix<N, 1> getShapeFunction(Precision r, Precision s, Precision t)            = 0;
 
     // containing derivatives of the shape functions h1 -> h8 with respect to r/s/t
-    virtual QuickMatrix<D, N> getLocalShapeDerivative(Precision r, Precision s, Precision t = 0) = 0;
+    virtual QuickMatrix<N, D> getLocalShapeDerivative(Precision r, Precision s, Precision t = 0) = 0;
 
     // computes the strain displacement matrix B from source
     // (already knowing the entries but just shaping)
     virtual QuickMatrix<DIM_TRAF(D), N * D>
-                        computeStrainDisplacementRelationFromSource(QuickMatrix<D, N> b_help) = 0;
+                        computeStrainDisplacementRelationFromSource(QuickMatrix<N, D> b_help) = 0;
 
     // returns the integration scheme over this element
     virtual DenseMatrix getIntegrationScheme()                                                = 0;

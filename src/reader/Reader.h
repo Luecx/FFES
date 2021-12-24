@@ -104,6 +104,21 @@ class Reader {
         sys->model.activateElementSet(elset_name);
         nextLine();
 
+        auto read_ids = []<int N>(Reader& reader, int offset = 1) {
+            std::array<ID, N> ids{};
+            int line_index = offset;
+            for (int i = 0; i < N; i++) {
+                if (line_index >= reader.line_data.csv_count) {
+                    reader.nextLine();
+                }
+                if (reader.line_data.csv[line_index].empty()) {
+                    line_index++;
+                }
+                ids[i] = std::stoi(reader.line_data.csv[line_index++]) - 1;
+            }
+            return ids;
+        };
+
         while (line_data.line_type != END_OF_FILE && line_data.line_type != HEADER) {
 
             if (line_data.line_type == COMMENT)
@@ -112,38 +127,24 @@ class Reader {
             auto id = std::stoi(line_data.csv[0]) - 1;
 
             if (type == "C3D8") {
-                auto n1 = std::stoi(line_data.csv[1]) - 1;
-                auto n2 = std::stoi(line_data.csv[2]) - 1;
-                auto n3 = std::stoi(line_data.csv[3]) - 1;
-                auto n4 = std::stoi(line_data.csv[4]) - 1;
-                auto n5 = std::stoi(line_data.csv[5]) - 1;
-                auto n6 = std::stoi(line_data.csv[6]) - 1;
-                auto n7 = std::stoi(line_data.csv[7]) - 1;
-                auto n8 = std::stoi(line_data.csv[8]) - 1;
-                sys->model.setElement<Iso3DHex8>(id, n1, n2, n3, n4, n5, n6, n7, n8);
-            } else if (type == "C2D3") {
-                auto n1 = std::stoi(line_data.csv[1]) - 1;
-                auto n2 = std::stoi(line_data.csv[2]) - 1;
-                auto n3 = std::stoi(line_data.csv[3]) - 1;
-                sys->model.setElement<Iso2DTri3>(id, n1, n2, n3);
+                auto h = read_ids.template operator()<8>(*this);
+                sys->model.setElement<Iso3DHex8>(id, h[0], h[1], h[2], h[3], h[4], h[5], h[6], h[7]);
+            } else if (type == "C3D20") {
+                auto h = read_ids.template operator()<20>(*this);
+                sys->model.setElement<Iso3DHex20>(id,
+                                                  h[ 0], h[ 1], h[ 2], h[ 3], h[ 4], h[ 5], h[ 6],
+                                                  h[ 7], h[ 8], h[ 9], h[10], h[11], h[12], h[13],
+                                                  h[14], h[15], h[16], h[17], h[18], h[19]);
+            }  else if (type == "C2D3") {
+                auto h = read_ids.template operator()<3>(*this);
+                sys->model.setElement<Iso2DTri3>(id, h[0], h[1], h[2]);
             } else if (type == "C2D4") {
-                auto n1 = std::stoi(line_data.csv[1]) - 1;
-                auto n2 = std::stoi(line_data.csv[2]) - 1;
-                auto n3 = std::stoi(line_data.csv[3]) - 1;
-                auto n4 = std::stoi(line_data.csv[4]) - 1;
-                sys->model.setElement<Iso2DQuad4>(id, n1, n2, n3, n4);
+                auto h = read_ids.template operator()<4>(*this);
+                sys->model.setElement<Iso2DQuad4>(id, h[0], h[1], h[2], h[3]);
             } else if (type == "C2D8") {
-                auto n1 = std::stoi(line_data.csv[1]) - 1;
-                auto n2 = std::stoi(line_data.csv[2]) - 1;
-                auto n3 = std::stoi(line_data.csv[3]) - 1;
-                auto n4 = std::stoi(line_data.csv[4]) - 1;
-                auto n5 = std::stoi(line_data.csv[5]) - 1;
-                auto n6 = std::stoi(line_data.csv[6]) - 1;
-                auto n7 = std::stoi(line_data.csv[7]) - 1;
-                auto n8 = std::stoi(line_data.csv[8]) - 1;
-                sys->model.setElement<Iso2DQuad8>(id, n1, n2, n3, n4, n5, n6, n7, n8);
+                auto h = read_ids.template operator()<8>(*this);
+                sys->model.setElement<Iso2DQuad8>(id, h[0], h[1], h[2], h[3], h[4], h[5], h[6], h[7]);
             } else {
-
                 ERROR(false, PARSING_SYNTAX_ERROR, "element type not known: " << type);
             }
             nextLine();

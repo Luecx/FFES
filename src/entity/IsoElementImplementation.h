@@ -28,14 +28,14 @@ QuickMatrix<D, D> IsoElement<N, D>::getJacobian(QuickMatrix<N, D>& node_coords,
                                                 Precision          s,
                                                 Precision          t) {
 
-    QuickMatrix<D, N> local_shape_derivative = getLocalShapeDerivative(r, s, t);
+    QuickMatrix<N, D> local_shape_derivative = getLocalShapeDerivative(r, s, t);
     QuickMatrix<D, D> jacobian {};
 
     for(int m = 0; m < D; m++){
         for(int n = 0; n < D; n++){
             Precision dxn_drm = 0;
             for(int k = 0; k < N; k++){
-                dxn_drm += node_coords(k, n) * local_shape_derivative(m, k);
+                dxn_drm += node_coords(k, n) * local_shape_derivative(k,m);
             }
             jacobian(m, n) = dxn_drm;
         }
@@ -77,7 +77,7 @@ QuickMatrix<DIM_TRAF(D), N * D> IsoElement<N, D>::computeStrainDisplacementRelat
     // error handling
     ERROR(det > 0, NEGATIVE_JACOBIAN, det);
 
-    auto B_help = inv * local_shape_derivative;
+    auto B_help = !(inv * !local_shape_derivative);
 
     return computeStrainDisplacementRelationFromSource(B_help);
 }

@@ -13,8 +13,8 @@ struct Iso2DQuad4 : public IsoElement<4, 2> {
 
     Iso2DQuad4(int node_1, int node_2, int node_3, int node_4);
 
-    QuickMatrix<2, 4> getLocalShapeDerivative(Precision r, Precision s, Precision t) override;
-    QuickMatrix<3, 8> computeStrainDisplacementRelationFromSource(QuickMatrix<2, 4> b_help) override;
+    QuickMatrix<4, 2> getLocalShapeDerivative(Precision r, Precision s, Precision t) override;
+    QuickMatrix<3, 8> computeStrainDisplacementRelationFromSource(QuickMatrix<4, 2> b_help) override;
     DenseMatrix       getIntegrationScheme() override;
     QuickMatrix<4, 1> getShapeFunction(Precision r, Precision s, Precision t) override;
     QuickMatrix<4, 2> getNodeLocalCoordinates() override;

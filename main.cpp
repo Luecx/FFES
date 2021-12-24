@@ -1,6 +1,8 @@
 #include "src/core/NodeData.h"
 #include "src/entity/Iso2DQuad4.h"
 #include "src/entity/Iso2DQuad8.h"
+#include "src/entity/Iso2DTri3.h"
+#include "src/entity/Iso2DTri6.h"
 #include "src/entity/Iso3DHex20.h"
 #include "src/entity/Iso3DHex8.h"
 #include "src/entity/IsoElement.h"
@@ -11,6 +13,7 @@
 #include <iostream>
 
 int main(int argc, char* argv[]) {
+
 
 //    System system{2000,100};
 //
@@ -188,33 +191,27 @@ int main(int argc, char* argv[]) {
 //        }
 //    }
 
-    for(int i = 1; i < 3; i++){
-        Reader reader{argv[i]};
-        auto system = reader.read();
-        system->getLoadCase()->compute();
-        std::cout << system->getLoadCase()->node_data[NODAL_STRESS] << std::endl;
-        delete system;
+    Reader reader{argv[1]};
+    auto system = reader.read();
+    system->getLoadCase()->compute();
+
+    std::ofstream myfile;
+    myfile.open (argv[2]);
+
+    for(int i = 0; i < system->model.max_node_count; i++){
+        if(system->model.node_data[NODE_CONNECTED_ELEMENTS][i][0] == 0) continue;
+        myfile
+            << std::setw(16) << system->model.node_data[POSITION][i][0]
+            << std::setw(16) << system->model.node_data[POSITION][i][1]
+            << std::setw(16) << system->getLoadCase()->node_data[DISPLACEMENT][i][0]
+            << std::setw(16) << system->getLoadCase()->node_data[DISPLACEMENT][i][1]
+            << std::setw(16) << system->getLoadCase()->node_data[NODAL_STRESS][i][0]
+            << std::setw(16) << system->getLoadCase()->node_data[NODAL_STRESS][i][1]
+            << std::setw(16) << system->getLoadCase()->node_data[NODAL_STRESS][i][2] << std::endl;
     }
 
-
-
-//    std::ofstream myfile;
-//    myfile.open (argv[2]);
-//
-//    for(int i = 0; i < system->model.max_node_count; i++){
-//        if(system->model.node_data[NODE_CONNECTED_ELEMENTS][i][0] == 0) continue;
-//        myfile
-//            << std::setw(16) << system->model.node_data[POSITION][i][0]
-//            << std::setw(16) << system->model.node_data[POSITION][i][1]
-//            << std::setw(16) << system->getLoadCase()->node_data[DISPLACEMENT][i][0]
-//            << std::setw(16) << system->getLoadCase()->node_data[DISPLACEMENT][i][1]
-//            << std::setw(16) << system->getLoadCase()->node_data[NODAL_STRESS][i][0]
-//            << std::setw(16) << system->getLoadCase()->node_data[NODAL_STRESS][i][1]
-//            << std::setw(16) << system->getLoadCase()->node_data[NODAL_STRESS][i][2] << std::endl;
-//    }
-//
-//    delete system;
-//    myfile.close();
+    delete system;
+    myfile.close();
 
 //    Reader reader{argv[1]};
 //    auto system = reader.read();

@@ -15,30 +15,21 @@
  *                   along with FFES.  If not, see <http://www.gnu.org/licenses/>.                  *
  *                                                                                                  *
  ****************************************************************************************************/
+
 //
-// Created by Luecx on 03.10.2021.
+// Created by Luecx on 05.04.2022.
 //
-#include "../system/LoadCase.h"
-#include "Model.h"
 
-void Model::computeStressAtNodes(LoadCase* load_case) {
-    int stress_dimension = nodal_dimension == 2 ? 3 : 6;
-    load_case->node_data[NODAL_STRESS]
-        .init(stress_dimension * max_node_count, max_node_count)
-        .even(stress_dimension)
-        .fill(0);
+#ifndef TOPO_PY_SRC_SOLVER_LDLT_H_
+#define TOPO_PY_SRC_SOLVER_LDLT_H_
 
-    for (const ElementPtr& element : elements) {
-        if (element == nullptr)
-            continue;
-        auto mat = element->computeStressAtNodes(load_case);
 
-        for (int i = 0; i < element->nodeCount(); i++) {
-            ID id = element->nodeIDS()[i];
-            for (int j = 0; j < stress_dimension; j++) {
-                load_case->node_data[NODAL_STRESS][id][j] +=
-                    mat(i, j) / this->node_data[NODE_CONNECTED_ELEMENTS][id][0];
-            }
-        }
-    }
-}
+#include "../eigen/IterativeLinearSolvers"
+#include "../eigen/Sparse"
+#include "../matrix/DenseMatrix.h"
+
+Eigen::Matrix<Precision,Eigen::Dynamic,1> simplical_ldlt(const Eigen::SparseMatrix<Precision>& matrix,
+                                                         const Eigen::Matrix<Precision,Eigen::Dynamic,1> &b);
+
+
+#endif    // TOPO_PY_SRC_SOLVER_LDLT_H_

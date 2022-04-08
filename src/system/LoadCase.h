@@ -25,6 +25,7 @@
 #include "../core/NodeData.h"
 #include "../model/Model.h"
 #include "../solver/CG.h"
+#include "../solver/LDLT.h"
 
 struct LoadCase {
     NodeData    node_data {};
@@ -61,7 +62,7 @@ struct LoadCase {
         model->numerateUnconstrainedNodes(this);
         auto matrix = model->buildReducedStiffnessMatrix(this);
         auto vector = model->buildReducedLoadVector(this);
-        auto solution = conjugate_gradient(matrix, vector);
+        auto solution = simplical_ldlt(matrix, vector);
         model->postProcessDisplacements(solution, this);
         model->computeStressAtNodes(this);
     }

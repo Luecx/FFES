@@ -21,8 +21,8 @@ struct Model {
     NodeData               node_data {};
     ElementData            element_data {};
 
-    std::vector<Element*>  elements {};
-    std::vector<Material*> materials {};
+    std::vector<ElementPtr>elements {};
+    std::vector<Material > materials {};
 
     // list of sets for elements and nodes
     std::vector<Set>       node_sets {};
@@ -53,21 +53,13 @@ struct Model {
     }
 
     virtual ~Model() {
-        for(Element*& element:elements){
-            delete element;
-            element = nullptr;
-        }
-        for(Material*& mat:materials){
-            delete mat;
-            mat = nullptr;
-        }
     }
 
     // functions to add nodes/elements
     void setNode(ID id, Precision x, Precision y, Precision z=(Precision)0);
     template<typename T, typename... Args>
     void setElement(ID id, Args&&... args){
-        auto el = new T{args...};
+        auto el = ElementPtr {new T{args...}};
         if(nodal_dimension == 0){
             nodal_dimension = el->nodeDOF();
         }

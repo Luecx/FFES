@@ -11,7 +11,7 @@ void Model::solidSection(const std::string& set, const std::string& material, Pr
     if(set_id < 0 || mat_id < 0) return;
 
     for(auto id:element_sets[set_id].ids){
-        elements[id]->material = materials[mat_id];
+        elements[id]->material = &materials[mat_id];
         element_data[ELEMENT_THICKNESS][id][0] = thickness;
     }
 }

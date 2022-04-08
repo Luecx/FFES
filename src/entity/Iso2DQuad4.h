@@ -19,13 +19,6 @@ struct Iso2DQuad4 : public IsoElement<4, 2> {
     QuickMatrix<4, 1> getShapeFunction(Precision r, Precision s, Precision t) override;
     QuickMatrix<4, 2> getNodeLocalCoordinates() override;
 
-    //    DenseMatrix computeLocalStiffness(LoadCase* load_case) override;
-    //    DenseMatrix computeStress(LoadCase* load_case, const DenseMatrix& evaluation_points)
-    //    override; DenseMatrix getIntegrationScheme() override;
-    //
-    //    int         nodeDOF() override;
-    //    int         nodeCount() override;
-    //    int*        nodeIDS() override;
 };
 
 #endif    // FEM_SRC_ENTITY_ISO2DQUAD4_H_

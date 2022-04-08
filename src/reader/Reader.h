@@ -9,14 +9,22 @@
 #include "LineType.h"
 
 #include <fstream>
+#include <sstream>
 #include <ostream>
+
+//#define USE_FILESYSTEM
 
 class Reader {
 
     LineData      line_data {};
-    std::ifstream infile;
 
+#ifdef USE_FILESYSTEM
+    std::ifstream infile;
     std::string   file;
+#else
+    std::stringstream infile;
+    std::string   content;
+#endif
     Reader*       parent            = nullptr;
     System*       system            = nullptr;
 
@@ -24,17 +32,31 @@ class Reader {
     int           max_element_count = 0;
 
     public:
+#ifdef USE_FILESYSTEM
     Reader(const std::string& p_file, Reader* p_parent = nullptr) {
         file   = p_file;
         parent = p_parent;
     }
+#else
+    Reader(const std::string& p_content) {
+        content = p_content;
+    }
+#endif
 
     private:
     void openFile() {
+#ifdef USE_FILESYSTEM
         infile = std::ifstream {file};
         ERROR(infile.is_open(), CANNOT_OPEN_FILE, file)
+#else
+        infile = std::stringstream {content};
+#endif
     }
-    void closeFile() { infile.close(); }
+    void closeFile() {
+#ifdef USE_FILESYSTEM
+        infile.close();
+#endif
+    }
     void nextLine() {
         bool res = std::getline(infile, line_data.line).operator bool();
         if (!res) {
@@ -50,6 +72,7 @@ class Reader {
 
         if (line_data.line.empty())
             line_data.line_type = END_OF_FILE;
+
     }
     System* getSystem() {
         if (parent != nullptr) {
@@ -151,10 +174,14 @@ class Reader {
         }
     }
     void read_INCLUDE() {
+#ifdef USE_FILESYSTEM
         auto   file_name = line_data.requireValue("INPUT");
         Reader reader {file_name, this};
         reader.read();
         nextLine();
+#else
+        ERROR(false, PARSING_SYNTAX_ERROR, "Cannot call *INCLUDE without a file system enabeld");
+#endif
     }
     void read_MATERIAL() {
         std::string mat_name = this->line_data.requireValue("NAME");
@@ -177,7 +204,7 @@ class Reader {
                     if (type == "ISOTROPIC") {
                         Precision young   = std::stod(line_data.csv[0]);
                         Precision poisson = std::stod(line_data.csv[1]);
-                        sys->model.materials[id]->setElasticity<IsotropicElasticity>(young, poisson);
+                        sys->model.materials[id].setElasticity<IsotropicElasticity>(young, poisson);
                     } else {
                         ERROR(false, ELEMENT_TYPE_NOT_KNOWN, type);
                     }
@@ -185,7 +212,7 @@ class Reader {
                 } else if (header_name == "DENSITY") {
                     nextLine();
                     Precision density                 = std::stod(line_data.csv[0]);
-                    sys->model.materials[id]->density = density;
+                    sys->model.materials[id].density = density;
                 } else {
                     break;
                 }
@@ -311,6 +338,7 @@ class Reader {
                 }
 
                 if (header_name == "INCLUDE") {
+#ifdef USE_FILESYSTEM
                     auto   file_name = line_data.requireValue("INPUT");
                     Reader reader {file_name, this};
                     reader.openFile();
@@ -318,6 +346,7 @@ class Reader {
                     reader.closeFile();
                     max_node_count += reader.max_node_count;
                     max_element_count += reader.max_element_count;
+#endif
                 }
             }
             this->nextLine();

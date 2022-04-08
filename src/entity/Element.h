@@ -6,6 +6,7 @@
 #include "../core/NodeData.h"
 #include "../material/Material.h"
 #include "../matrix/DenseMatrix.h"
+#include <memory>
 
 struct LoadCase;
 struct Model;
@@ -33,5 +34,7 @@ struct Element {
     virtual int         nodeCount()                                                               = 0;
     virtual int*        nodeIDS()                                                                 = 0;
 };
+
+using ElementPtr = std::shared_ptr<Element>;
 
 #endif    // FEM_SRC_ENTITY_ELEMENT_H_

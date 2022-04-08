@@ -15,30 +15,44 @@
  *                   along with FFES.  If not, see <http://www.gnu.org/licenses/>.                  *
  *                                                                                                  *
  ****************************************************************************************************/
+
 //
-// Created by Luecx on 03.10.2021.
+// Created by Luecx on 05.04.2022.
 //
-#include "../system/LoadCase.h"
-#include "Model.h"
 
-void Model::computeStressAtNodes(LoadCase* load_case) {
-    int stress_dimension = nodal_dimension == 2 ? 3 : 6;
-    load_case->node_data[NODAL_STRESS]
-        .init(stress_dimension * max_node_count, max_node_count)
-        .even(stress_dimension)
-        .fill(0);
+#include <chrono>
+#include "LDLT.h"
 
-    for (const ElementPtr& element : elements) {
-        if (element == nullptr)
-            continue;
-        auto mat = element->computeStressAtNodes(load_case);
+Eigen::Matrix<Precision,Eigen::Dynamic,1> simplical_ldlt(const Eigen::SparseMatrix<Precision>& matrix,
+                                                           const Eigen::Matrix<Precision,Eigen::Dynamic,1> &b){
 
-        for (int i = 0; i < element->nodeCount(); i++) {
-            ID id = element->nodeIDS()[i];
-            for (int j = 0; j < stress_dimension; j++) {
-                load_case->node_data[NODAL_STRESS][id][j] +=
-                    mat(i, j) / this->node_data[NODE_CONNECTED_ELEMENTS][id][0];
-            }
-        }
+    Eigen::Matrix<Precision,Eigen::Dynamic,1> sol(b.size()), t(b.size());
+    std::cout << "Attempting to solve matrix: " << b.size() << "x" << b.size() << std::endl;
+    Eigen::SimplicialLDLT<Eigen::SparseMatrix<Precision>> solver{};
+    auto start = std::chrono::system_clock::now();
+
+    solver.compute(matrix);
+    if(solver.info()!=Eigen::Success) {
+        // decomposition failed
+        std::cout << "decomposition failed" << std::endl;
+        return sol;
     }
+
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> diff = end - start;
+    std::cout << "Decomposition finished; elapsed time: " << round(diff.count() * 1000) << std::endl;
+    start = std::chrono::system_clock::now();
+
+    sol = solver.solve(b);
+    if(solver.info()!=Eigen::Success) {
+        // solving failed
+        std::cout << "solving failed" << std::endl;
+        return sol;
+    }
+
+    end = std::chrono::system_clock::now();
+    diff = end - start;
+    std::cout << "Solving finished; elapsed time: " << round(diff.count() * 1000) << std::endl;
+
+    return sol;
 }

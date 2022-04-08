@@ -7,6 +7,8 @@
 #define FEM_SRC_MATERIAL_ELASTICITY_H_
 
 #include "../matrix/QuickMatrix.h"
+#include <memory>
+
 
 struct Elasticity{
 
@@ -24,7 +26,8 @@ struct Elasticity{
         update();
         return mat_matrix_3d;
     }
-
 };
+
+using ElasticityPtr = std::shared_ptr<Elasticity>;
 
 #endif    // FEM_SRC_MATERIAL_ELASTICITY_H_

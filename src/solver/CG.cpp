@@ -6,6 +6,8 @@
 Eigen::Matrix<Precision,Eigen::Dynamic,1> conjugate_gradient(const Eigen::SparseMatrix<Precision>& matrix,
                                    const Eigen::Matrix<Precision,Eigen::Dynamic,1>& b) {
 
+    std::cout << matrix << std::endl;
+    std::cout << b << std::endl;
 
     Eigen::Matrix<Precision,Eigen::Dynamic,1> sol(b.size()), t(b.size());
     std::cout << "Attempting to solve matrix: " << b.size() << "x" << b.size() << std::endl;
@@ -34,7 +36,10 @@ Eigen::Matrix<Precision,Eigen::Dynamic,1> conjugate_gradient(const Eigen::Sparse
 
     std::chrono::duration<double> diff = end - start;
 
-    std::cout << "Solved system of equations; elapsed time: " << round(diff.count() * 1000) << std::endl;
+    std::cout << "Solved system of equations; elapsed time: " << round(diff.count() * 1000)
+              << " estimated error: " << solver.error() <<  std::endl;
+    std::cout << sol << std::endl;
+    std::cout << matrix * sol - b << std::endl;
 
     return sol;
 }

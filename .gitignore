@@ -6,3 +6,5 @@ cmake-build-debug/
 bin/
 
 cmake-build-release/
+
+resources/inputs/

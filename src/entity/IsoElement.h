@@ -71,6 +71,7 @@ struct IsoElement : public Element {
     virtual QuickMatrix<DIM_TRAF(D), DIM_TRAF(D)> getAdjustedMaterialMatrix(LoadCase* load_case = nullptr);
 
     Precision   compliance(LoadCase* load_case) override;
+    Precision   volume() override;
     Precision   interpolate(DenseMatrix nodal, Precision r, Precision s, Precision t) override;
     DenseMatrix computeLocalStiffness(LoadCase* load_case) override;
     DenseMatrix computeLocalMassMatrix(LoadCase* load_case) override;

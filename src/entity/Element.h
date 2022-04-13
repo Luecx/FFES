@@ -29,6 +29,7 @@ struct Element {
 
     virtual Precision   interpolate(DenseMatrix nodal, Precision r, Precision s, Precision t = 0) = 0;
     virtual Precision   compliance(LoadCase* load_case)                                           = 0;
+    virtual Precision   volume()                                                                  = 0;
 
     virtual int         nodeDOF()                                                                 = 0;
     virtual int         nodeCount()                                                               = 0;

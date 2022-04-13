@@ -102,7 +102,8 @@ QuickMatrix<DIM_TRAF(D), DIM_TRAF(D)> IsoElement<N, D>::getAdjustedMaterialMatri
 
     // adjust material based on simp scaling. Scaled by rho^p where rho is a density scalar
     // between 0 and 1. p is a penality factor.
-    if (load_case != nullptr && load_case->element_data[SIMP_DENSITY_FACTOR].isInitialised()
+    if (load_case != nullptr
+        && load_case->element_data[SIMP_DENSITY_FACTOR]  .isInitialised()
         && load_case->element_data[SIMP_DENSITY_EXPONENT].isInitialised()) {
         mat_matrix *= pow(load_case->element_data[SIMP_DENSITY_FACTOR][element_id][0],
                           load_case->element_data[SIMP_DENSITY_EXPONENT][element_id][0]);
@@ -207,6 +208,29 @@ Precision IsoElement<N, D>::compliance(LoadCase* load_case) {
     auto disp      = DenseMatrix(getNodalData(DISPLACEMENT, load_case));
     return (!disp * stiffness * disp)(0,0);
 }
+
+template<int N, int D>
+Precision IsoElement<N, D>::volume(){
+    auto      node_coords = getNodalData(POSITION).template reshape<N, D>();
+    auto      integration = getIntegrationScheme();
+    Precision volume      = 0;
+
+    for (int i = 0; i < integration.getM(); i++) {
+        Precision r = integration(i, 0);
+        Precision s = integration(i, 1);
+        Precision t = integration(i, 2);
+
+        if (D == 2)
+            t = 0;
+
+        Precision det = 0;
+        computeStrainDisplacementRelation(node_coords, det, r, s, t);
+
+        volume += integration(i, integration.getN() - 1) * det
+                  * model->element_data[ELEMENT_THICKNESS][element_id][0];
+    }
+    return volume;
+};
 
 template<int N, int D>
 Precision IsoElement<N, D>::interpolate(DenseMatrix nodal, Precision r, Precision s, Precision t) {

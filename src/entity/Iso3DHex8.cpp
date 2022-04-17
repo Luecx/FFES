@@ -27,7 +27,7 @@ QuickMatrix<8, 3> Iso3DHex8::getLocalShapeDerivative(Precision r, Precision s, P
     Precision         tm = t - 1;
 
     // shape function evaluation. 4 entries for 1) sign, 2) r 3) s 4) t
-    QuickMatrix<4,8> shape_function {};
+    QuickMatrix<8,4> shape_function {};
     for (int n = 0; n < 8; n++) {
         shape_function(n, 0) = (n == 0 || n == 2 || n == 5 || n == 7) ? -1 : 1;
         shape_function(n, 1) = ((n + 1) / 2) % 2 == 1 ? rp : rm;

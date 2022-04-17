@@ -236,6 +236,7 @@ EMSCRIPTEN_KEEPALIVE void wasm_analysis(const int32_t n_nodes,
         // put results into arrays above
         wasm_save(system, 0);
         delete system;
+
         std::cout << "Finished computation" << std::endl;
     }};
     th.detach();
@@ -457,60 +458,3 @@ EMSCRIPTEN_KEEPALIVE void wasm_get_density(float* res, int it){
 }
 #endif
 #endif
-
-int main(int argc, char* argv[]) {
-
-//    Reader reader{R"(F:\OneDrive\ProgrammSpeicher\CLionProjects\FFES\resources\inputs\c2d4_5x5.inp)"};
-//    System* system = reader.read();
-//
-//    wasm_topo(system, 0.5, 3.0, 7,0.001,0.2,1);
-
-//    constexpr int n_nodes = 9;
-//    constexpr int n_elems  = 4;
-//    constexpr int nodes_per_element = 4;
-//    float node_coords[n_nodes * 2]{
-//        0,0,
-//        0,1,
-//        0,2,
-//        1,0,
-//        1,1,
-//        1,2,
-//        2,0,
-//        2,1,
-//        2,2
-//    };
-//    float elem_node_ids[n_elems * nodes_per_element]{
-//        0,3,4,1,
-//        1,4,5,2,
-//        3,6,7,4,
-//        4,7,8,5,
-//    };
-//    float material[2]{70000,0.3};
-//    float restricted[n_nodes * 2]{};
-//    float displacement[n_nodes * 2]{};
-//    float loads[n_nodes * 2]{};
-//
-//    restricted[0 * 2 + 0] = 1;
-//    restricted[0 * 2 + 1] = 1;
-//    restricted[3 * 2 + 1] = 1;
-//
-//    loads[8 * 2 + 0] = 1;
-//
-//    wasm_topo(n_nodes,
-//              n_elems,
-//              node_coords,
-//              elem_node_ids,
-//              nodes_per_element,
-//              material,
-//              restricted,
-//              displacement,
-//              loads,
-//
-//              0.75,
-//              1,
-//              1,
-//              0.01,
-//              0.03,
-//              100);
-
-}

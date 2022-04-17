@@ -106,6 +106,7 @@
         }
     };
     const processAnalysisOutput = output => {
+        console.log(output);
         if (output.startsWith("Attempting to solve matrix:")) {
             notify("analysis", [output])
         }

@@ -8,3 +8,5 @@ bin/
 cmake-build-release/
 
 resources/inputs/
+
+resources/scripts/

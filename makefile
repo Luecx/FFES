@@ -30,7 +30,7 @@ LIBS     = -pthread -Wl,--whole-archive -lpthread -Wl,--no-whole-archive
 WFLAGS = -std=c++20
 CFLAGS = -O3 $(WFLAGS) -DNDEBUG -flto
 RFLAGS = -O3 $(WFLAGS) -DNDEBUG -flto -static
-PFLAGS = -O0 $(WFLAGS) -DNDEBUG -p -pg
+PFLAGS = -O3 $(WFLAGS) -DNDEBUG -p -pg
 DFLAGS = -O0 $(WFLAGS) -g
 
 
@@ -62,15 +62,19 @@ FULL_MAKRO 		 = $(VERSION_MAKRO) $(ENABLE_FILESYS)
 #--------------------------------------------- TARGETS  ---------------------------------------------------------------#
 ########################################################################################################################
 
+native:
+	mkdir -p $(_OUT)
+	$(CXX) $(CFLAGS) $(SRC_CXX) $(SRC_C) $(FULL_MAKRO) $(LIBS) $(NATIVEFLAGS) -o $(EXE)-x64-$(PREFIX)-native$(SUFFIX)
+
 emscripten:
 	$(EMCC) $(CFLAGS) $(SRC_CXX) $(EMS_MAKROS) $(VERSION_MAKRO) $(LIBS) -o F:/OneDrive/ProgrammSpeicher/PHPStormProjects/FEMWebsite/solver/$(NAME)_$(MAJOR).$(MINOR).js
 
-native:
-	mkdir -p $(ROOT)$(FOLDER)
-	$(CXX) $(CFLAGS) $(SRC_CXX) $(SRC_C) $(FULL_MAKRO) $(LIBS) $(NATIVEFLAGS) -o $(EXE)-x64-$(PREFIX)-native$(SUFFIX)
+profile:
+	mkdir -p $(_OUT)
+	$(CXX) $(PFLAGS) $(SRC_CXX) $(SRC_C) $(FULL_MAKRO) $(LIBS) $(NATIVEFLAGS) -o $(EXE)-x64-$(PREFIX)-profile$(SUFFIX)
 
 release:
-	mkdir -p $(ROOT)$(FOLDER)
+	mkdir -p $(_OUT)
 	$(CC) $(RFLAGS) $(SRC_CXX) $(SRC_C) $(FULL_MAKRO) $(LIBS) $(AVX512FLAGS) -o $(EXE)-x64-$(PREFIX)-avx512$(SUFFIX)
 	$(CC) $(RFLAGS) $(SRC_CXX) $(SRC_C) $(FULL_MAKRO) $(LIBS) $(AVX2FLAGS) -o $(EXE)-x64-$(PREFIX)-avx2$(SUFFIX)
 	$(CC) $(RFLAGS) $(SRC_CXX) $(SRC_C) $(FULL_MAKRO) $(LIBS) $(SSEFLAGS) -o $(EXE)-x64-$(PREFIX)-sse2$(SUFFIX)

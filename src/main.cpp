@@ -9,10 +9,11 @@
 #include "material/IsotropicElasticity.h"
 #include "model/Model.h"
 #include "reader/Reader.h"
-#include "delauney/Node.h"
-#include "delauney/Edge.h"
-#include "delauney/Triangle.h"
-#include "delauney/Triangulate2D.h"
+#include "delaunay/Node.h"
+#include "delaunay/Edge.h"
+#include "delaunay/Triangle.h"
+#include "delaunay/ConstrainedDelaunay2D.h"
+#include "delaunay/Mesher2D.h"
 #include <random>
 #include <thread>
 
@@ -221,43 +222,16 @@ auto since(std::chrono::time_point<clock_t, duration_t> const& start)
 {
     return std::chrono::duration_cast<result_t>(clock_t::now() - start);
 }
-
-int main(int argc, char* argv[]) {
-
-    using namespace delaunay;
-
-//    Node n1{0.303995,0.0149846};
-//    Node n2{4,-1};
-//    Node n3{0.585009,0.479873};
-//    Node n4{0.710501,0.513535};
 //
-//    Triangle t1{};
-//    Triangle t2{};
-//    t1.createEdges(&n1,&n2,&n3);
-//    t2.createEdges(&n2,&n4,&n3);
-//    t1.getE2().link(&t2.e3);
+//int main(int argc, char* argv[]) {
 //
-//    std::cout << t1.imscribed(&n4) << std::endl;
-
-    int tests[]{100000};
-
-    for(int& h:tests){
-        Triangulate2D triangulate_2d{0,1,0,1,h};
-        std::vector<Node> nodes{};
-        for(int i = 0; i < h; i++){
-            float x = (i % (int)sqrt(h)) / (float)(int)sqrt(h);
-            float y = (i / (int)sqrt(h)) / (float)(int)sqrt(h);
-//            float x = rand() / (Precision)(RAND_MAX);
-//            float y = rand() / (Precision)(RAND_MAX);
-            nodes.push_back({x,y});
-        }
-        std::shuffle(nodes.begin(), nodes.end(), std::mt19937(std::random_device()()));
-        auto start = std::chrono::steady_clock::now();
-//        std::srand(start.time_since_epoch().count());
-        for(int i = 0; i < h; i++){
-            triangulate_2d.addNode(nodes[i]);
-        }
-        std::cout << "Elapsed(mms)=" << since(start).count() << std::endl;
-//        std::cout << triangulate_2d << std::endl;
-    }
-}
+//    using namespace delaunay;
+//
+//
+//
+////    ConstrainedDelaunay2D triangulate_2d{0,1,0,1,30};
+////    triangulate_2d.addNode(Node{0.0,0.0});
+////    triangulate_2d.addNode(Node{1.0,1.0});
+////    triangulate_2d.addNode(Node{0.5,0.5});
+////    std::cout << triangulate_2d << std::endl;
+//}

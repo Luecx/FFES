@@ -1,20 +1,4 @@
-/****************************************************************************************************
- *                                                                                                  *
- *                                                FFES                                              *
- *                                          by. Finn Eggers                                         *
- *                                                                                                  *
- *                    FFES is free software: you can redistribute it and/or modify                  *
- *                it under the terms of the GNU General Public License as published by              *
- *                 the Free Software Foundation, either version 3 of the License, or                *
- *                                (at your option) any later version.                               *
- *                       FFES is distributed in the hope that it will be useful,                    *
- *                   but WITHOUT ANY WARRANTY; without even the implied warranty of                 *
- *                   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                  *
- *                            GNU General Public License for more details.                          *
- *                 You should have received a copy of the GNU General Public License                *
- *                   along with FFES.  If not, see <http://www.gnu.org/licenses/>.                  *
- *                                                                                                  *
- ****************************************************************************************************/
+
 
 //
 // Created by Luecx on 07.04.2022.
@@ -241,35 +225,13 @@ EMSCRIPTEN_KEEPALIVE void wasm_analysis(const int32_t n_nodes,
     }};
     th.detach();
 }
-
-EMSCRIPTEN_KEEPALIVE void wasm_topo    (
-                                        const int32_t n_nodes,
-                                        const int32_t n_elems,
-                                        const float*  node_coords,
-                                        const float*  elem_node_ids,
-                                        const int32_t nodes_per_element,
-                                        const float*  material,
-                                        const float*  restricted,
-                                        const float*  displacement,
-                                        const float*  loads,
-
-                                        const float target_density,
-                                        const float simp_exponent,
-                                        const float r_min,
-                                        const float min_density,
-                                        const float move_limit,
-                                        const int32_t max_iterations){
-
-    // build the system
-    System* system = wasm_build_system(n_nodes,
-                                       n_elems,
-                                       node_coords,
-                                       elem_node_ids,
-                                       nodes_per_element,
-                                       material,
-                                       restricted,
-                                       displacement,
-                                       loads);
+void wasm_topo_opt(System* system,
+               const float target_density,
+               const float simp_exponent,
+               const float r_min,
+               const float min_density,
+               const float move_limit,
+               const int32_t max_iterations){
 
     std::cout << "target_density: " << target_density << std::endl;
     std::cout << "simp_exponent:  " << simp_exponent << std::endl;
@@ -277,6 +239,10 @@ EMSCRIPTEN_KEEPALIVE void wasm_topo    (
     std::cout << "min_density:    " << min_density << std::endl;
     std::cout << "move_limit:     " << move_limit << std::endl;
     std::cout << "max_iterations: " << max_iterations << std::endl;
+
+    int n_elems = system->model.max_element_count;
+    int n_nodes = system->model.max_node_count;
+    int nodes_per_element = system->model.elements[0]->nodeCount();
 
     std::thread th {[=]() {
         // enable simp
@@ -408,7 +374,7 @@ EMSCRIPTEN_KEEPALIVE void wasm_topo    (
                 if (el == nullptr)
                     continue;
                 change += std::abs(prev_density[el->element_id][0] -
-                    system->getLoadCase()->element_data[SIMP_DENSITY_FACTOR][el->element_id][0]);
+                                   system->getLoadCase()->element_data[SIMP_DENSITY_FACTOR][el->element_id][0]);
             }
 
             // end if the change is small enough
@@ -416,9 +382,8 @@ EMSCRIPTEN_KEEPALIVE void wasm_topo    (
                 break;
             }
 
-
             wasm_save(system, it+1);
-            std::cout << "Iteration " << (it+1) << " finished. Compliance: " << compliance << std::endl;
+            std::cout << "Iteration " << (it+1) << " finished. Compliance: " << std::setprecision(10) << compliance << std::endl;
         }
 
         std::cout << "Finished computation" << std::endl;
@@ -427,6 +392,38 @@ EMSCRIPTEN_KEEPALIVE void wasm_topo    (
         delete system;
     }};
     th.detach();
+}
+EMSCRIPTEN_KEEPALIVE void wasm_topo    (
+                                        const int32_t n_nodes,
+                                        const int32_t n_elems,
+                                        const float*  node_coords,
+                                        const float*  elem_node_ids,
+                                        const int32_t nodes_per_element,
+                                        const float*  material,
+                                        const float*  restricted,
+                                        const float*  displacement,
+                                        const float*  loads,
+
+                                        const float target_density,
+                                        const float simp_exponent,
+                                        const float r_min,
+                                        const float min_density,
+                                        const float move_limit,
+                                        const int32_t max_iterations){
+
+    // build the system
+    System* system = wasm_build_system(n_nodes,
+                                       n_elems,
+                                       node_coords,
+                                       elem_node_ids,
+                                       nodes_per_element,
+                                       material,
+                                       restricted,
+                                       displacement,
+                                       loads);
+
+    wasm_topo_opt(system, target_density, simp_exponent, r_min, min_density, move_limit, max_iterations);
+
 }
 
 EMSCRIPTEN_KEEPALIVE void wasm_get_displacement_x(float* res, int it){
@@ -453,6 +450,11 @@ EMSCRIPTEN_KEEPALIVE void wasm_get_stress_mises(float* res, int it){
 EMSCRIPTEN_KEEPALIVE void wasm_get_density(float* res, int it){
     wasm_result_density[it].storeInArray(res);
 }
+
+int main(){
+
+}
+
 #ifdef __EMSCRIPTEN__
 #ifdef __cplusplus
 }

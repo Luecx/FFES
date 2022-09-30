@@ -87,7 +87,7 @@ delaunay::Precision delaunay::Mesher2D::densityFunction(delaunay::Node node) {
                 Edge e = Edge{};
                 e.n1 = &b.nodes[i];
                 e.n2 = &b.nodes[i+1];
-                cdt.addSegment(e);
+//                cdt.addSegment(e);
             }
         }
     }

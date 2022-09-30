@@ -28,10 +28,10 @@ LIBS     = -pthread -Wl,--whole-archive -lpthread -Wl,--no-whole-archive
 ########################################################################################################################
 
 WFLAGS = -std=c++20
-CFLAGS = -O3 $(WFLAGS) -DNDEBUG -flto
-RFLAGS = -O3 $(WFLAGS) -DNDEBUG -flto -static
-PFLAGS = -O3 $(WFLAGS) -DNDEBUG -p -pg
-DFLAGS = -O0 $(WFLAGS) -g
+CFLAGS = $(WFLAGS) -O3 -DNDEBUG -flto
+RFLAGS = $(WFLAGS) -O3 -DNDEBUG -flto -static
+PFLAGS = $(WFLAGS) -O3 -DNDEBUG -p -pg
+DFLAGS = $(WFLAGS) -O0 -g
 
 
 # ------------------------------- vector extensions ----------------------------------------------
@@ -45,12 +45,12 @@ NATIVEFLAGS = -march=native
 # ------------------------------- Emscripten ---------------------------------------------
 EMS_MEMORY		 = -s TOTAL_MEMORY=4294967296 -s ALLOW_MEMORY_GROWTH=1 -s INITIAL_MEMORY=33554432
 EMS_THREADS 	 = -s PROXY_TO_PTHREAD
-EMS_KEEPALIVE	 = -s NO_EXIT_RUNTIME=1 -s "EXPORTED_RUNTIME_METHODS=['ccall']"
+EMS_KEEPALIVE	 = -s "EXPORTED_RUNTIME_METHODS=['ccall']"
 EMS_SIMD		 = -msimd128
 EMS_ENVIRONMENT  = -s MODULARIZE=1 -s EXPORT_NAME=FFES -s ENVIRONMENT=web,worker
 EMS_PREAMBLE     =  --pre-js $(_ROOT)/src/wasm/web_preamble.js
 EMS_ASSERT		 = -s ASSERTIONS=1
-EMS_MAKROS		 = $(EMS_MEMORY) $(EMS_THREADS) $(EMS_KEEPALIVE) $(EMS_SIMD) $(EMS_ENVIRONMENT) $(EMS_PREAMBLE) $(EMS_ASSERT)
+EMS_MAKROS		 = $(EMS_MEMORY) $(EMS_THREADS) $(EMS_KEEPALIVE) $(EMS_ENVIRONMENT) $(EMS_PREAMBLE) $(EMS_ASSERT)
 
 # ------------------------------- Makros ----------------------------------------------
 VERSION_MAKRO    = -DMINOR_VERSION=$(MINOR) -DMAJOR_VERSION=$(MAJOR)

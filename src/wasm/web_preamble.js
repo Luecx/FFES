@@ -85,7 +85,7 @@
             "number", "number", "number", "number", "number",
             "number", "number", "number", "number", "number",
             "number", "number", "number", "number", "number"], [
-                n_nodes, n_elems, _node_coords, _elem_node_ids, nodes_per_element,
+            n_nodes, n_elems, _node_coords, _elem_node_ids, nodes_per_element,
             _material, _restricted, _displacement, _loads, target_density,
             simp_exponent, r_min, min_density, move_limit, max_iterations]);
         Module._free(_node_coords);
@@ -142,9 +142,10 @@
             let it = parseInt(output.split(" ")[1]);
             let density = getFloatArrayFromFunctionCall("wasm_get_density", n_nodes, it);
             notify("topo", [output, {
-                "Density": density}])
+                "Density": density
+            }])
         }
-        if (output.startsWith("Finished computation")){
+        if (output.startsWith("Finished computation")) {
             notify("topo", [output, {}])
             is_running = false
         }

@@ -1,10 +1,4 @@
 
-
-//
-// Created by Luecx on 07.04.2022.
-//
-//
-
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
 #endif
@@ -30,9 +24,9 @@
 #include <iostream>
 
 #ifdef __EMSCRIPTEN__
+
 #ifdef __cplusplus
 extern "C" {
-#endif
 #endif
 
 struct ResultEntry {
@@ -150,7 +144,7 @@ void wasm_save(System* system, int id){
     wasm_result_displacement_xy[id] = ResultEntry(system->model.max_node_count);
     wasm_result_density        [id] = ResultEntry(system->model.max_node_count);
 
-    
+
     for (int i = 0; i < system->model.max_node_count; i++) {
         if (system->model.node_data[NODE_CONNECTED_ELEMENTS][i][0] == 0)
             continue;
@@ -334,7 +328,7 @@ void wasm_topo_opt(System* system,
             // apply optimality criterion
             Precision lag_1 = 0;
             Precision lag_2 = 1e9;
-            while((lag_2-lag_1) > 1e-12){
+            while((lag_2-lag_1) > 1e-10){
                 Precision lag_mid = (lag_2 + lag_1) / 2;
 
                 Precision mass = 0;
@@ -455,7 +449,6 @@ int main(){
 
 }
 
-#ifdef __EMSCRIPTEN__
 #ifdef __cplusplus
 }
 #endif
